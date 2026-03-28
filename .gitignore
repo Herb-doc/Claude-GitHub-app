@@ -1,0 +1,12 @@
+node_modules/
+dist/
+.env
+.env.local
+credentials.json
+token.json
+*.pyc
+__pycache__/
+.venv/
+venv/
+hermes_data_backup*.json
+.DS_Store

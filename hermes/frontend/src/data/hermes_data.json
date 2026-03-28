@@ -1,0 +1,398 @@
+{
+  "findings": [
+    {
+      "date": "2019-08-30",
+      "test_name": "CD8 T-cells",
+      "value": 11.8,
+      "unit": "%",
+      "reference_range": "12.0-35.5%",
+      "flag": "LOW",
+      "category": "Immune",
+      "source": "Life Extension National Diagnostics",
+      "status": "active"
+    },
+    {
+      "date": "2019-08-30",
+      "test_name": "CD4/CD8 Ratio",
+      "value": 4.74,
+      "unit": "ratio",
+      "reference_range": "0.92-3.72",
+      "flag": "HIGH",
+      "category": "Immune",
+      "source": "Life Extension National Diagnostics",
+      "status": "active"
+    },
+    {
+      "date": "2019-08-30",
+      "test_name": "IgA",
+      "value": 220,
+      "unit": "mg/dL",
+      "reference_range": "20-172 mg/dL",
+      "flag": "HIGH",
+      "category": "Immune",
+      "source": "Life Extension National Diagnostics",
+      "status": "active"
+    },
+    {
+      "date": "2019-08-30",
+      "test_name": "TNF-alpha",
+      "value": 1.8,
+      "unit": "pg/mL",
+      "reference_range": "0.0-2.2 pg/mL",
+      "flag": "WATCH",
+      "category": "Inflammation",
+      "source": "Life Extension National Diagnostics",
+      "status": "monitoring"
+    },
+    {
+      "date": "2019-08-30",
+      "test_name": "hsCRP",
+      "value": 1.24,
+      "unit": "mg/L",
+      "reference_range": "<1.0 mg/L optimal",
+      "flag": "WATCH",
+      "category": "Inflammation",
+      "source": "Life Extension National Diagnostics",
+      "status": "monitoring"
+    },
+    {
+      "date": "2019-08-30",
+      "test_name": "NK Cells",
+      "value": "Normal",
+      "unit": "",
+      "reference_range": "Normal",
+      "flag": "NORMAL",
+      "category": "Immune",
+      "source": "Life Extension National Diagnostics",
+      "status": "resolved"
+    },
+    {
+      "date": "2019-08-30",
+      "test_name": "IgG",
+      "value": 961,
+      "unit": "mg/dL",
+      "reference_range": "700-1600 mg/dL",
+      "flag": "NORMAL",
+      "category": "Immune",
+      "source": "Life Extension National Diagnostics",
+      "status": "resolved"
+    },
+    {
+      "date": "2019-08-30",
+      "test_name": "IgM",
+      "value": 100,
+      "unit": "mg/dL",
+      "reference_range": "40-230 mg/dL",
+      "flag": "NORMAL",
+      "category": "Immune",
+      "source": "Life Extension National Diagnostics",
+      "status": "resolved"
+    },
+    {
+      "date": "2019-08-30",
+      "test_name": "ANA",
+      "value": "Negative",
+      "unit": "",
+      "reference_range": "Negative",
+      "flag": "NORMAL",
+      "category": "Autoimmune",
+      "source": "Life Extension National Diagnostics",
+      "status": "resolved"
+    },
+    {
+      "date": "2021-09-01",
+      "test_name": "Total Testosterone",
+      "value": 65,
+      "unit": "ng/dL",
+      "reference_range": "300-1000 ng/dL",
+      "flag": "CRITICAL",
+      "category": "Hormonal",
+      "source": "Lab Records",
+      "status": "active"
+    },
+    {
+      "date": "2023-07-01",
+      "test_name": "Total Testosterone",
+      "value": 947,
+      "unit": "ng/dL",
+      "reference_range": "300-1000 ng/dL",
+      "flag": "NORMAL",
+      "category": "Hormonal",
+      "source": "Lab Records",
+      "status": "resolved"
+    },
+    {
+      "date": "2024-01-01",
+      "test_name": "Total Testosterone",
+      "value": 119,
+      "unit": "ng/dL",
+      "reference_range": "300-1000 ng/dL",
+      "flag": "LOW",
+      "category": "Hormonal",
+      "source": "Lab Records",
+      "status": "active"
+    },
+    {
+      "date": "2024-04-01",
+      "test_name": "Stool Calprotectin",
+      "value": 67,
+      "unit": "mcg/g",
+      "reference_range": "<50 mcg/g normal",
+      "flag": "WATCH",
+      "category": "GI",
+      "source": "Quest Diagnostics",
+      "status": "monitoring"
+    },
+    {
+      "date": "2024-05-01",
+      "test_name": "Total Testosterone",
+      "value": 748,
+      "unit": "ng/dL",
+      "reference_range": "300-1000 ng/dL",
+      "flag": "NORMAL",
+      "category": "Hormonal",
+      "source": "Lab Records",
+      "status": "resolved"
+    },
+    {
+      "date": "2024-09-01",
+      "test_name": "Total Testosterone",
+      "value": 947,
+      "unit": "ng/dL",
+      "reference_range": "300-1000 ng/dL",
+      "flag": "NORMAL",
+      "category": "Hormonal",
+      "source": "Lab Records",
+      "status": "resolved"
+    },
+    {
+      "date": "2025-04-20",
+      "test_name": "RBC",
+      "value": "Elevated",
+      "unit": "",
+      "reference_range": "4.7-6.1 M/uL",
+      "flag": "HIGH",
+      "category": "Hematology",
+      "source": "Blood Work Results",
+      "status": "active"
+    },
+    {
+      "date": "2025-04-20",
+      "test_name": "Hemoglobin",
+      "value": "Elevated",
+      "unit": "g/dL",
+      "reference_range": "13.5-17.5 g/dL",
+      "flag": "HIGH",
+      "category": "Hematology",
+      "source": "Blood Work Results",
+      "status": "active"
+    },
+    {
+      "date": "2025-04-20",
+      "test_name": "Hematocrit",
+      "value": "Elevated",
+      "unit": "%",
+      "reference_range": "38.3-48.6%",
+      "flag": "HIGH",
+      "category": "Hematology",
+      "source": "Blood Work Results",
+      "status": "active"
+    },
+    {
+      "date": "2025-06-03",
+      "test_name": "CT Abdomen - Liver",
+      "value": "Hepatic cirrhosis with nodular contour",
+      "unit": "",
+      "reference_range": "Normal liver architecture",
+      "flag": "CRITICAL",
+      "category": "Hepatic",
+      "source": "CT Scan of Liver",
+      "status": "active"
+    },
+    {
+      "date": "2025-06-03",
+      "test_name": "Paraumbilical Vein",
+      "value": "Recanalized",
+      "unit": "",
+      "reference_range": "Not recanalized",
+      "flag": "CRITICAL",
+      "category": "Hepatic",
+      "source": "CT Scan of Liver",
+      "status": "active"
+    },
+    {
+      "date": "2025-06-03",
+      "test_name": "Liver Nodules",
+      "value": "Internal heterogeneity — regenerating nodules",
+      "unit": "",
+      "reference_range": "Homogeneous parenchyma",
+      "flag": "WATCH",
+      "category": "Hepatic",
+      "source": "CT Scan of Liver",
+      "status": "monitoring"
+    },
+    {
+      "date": "2025-06-03",
+      "test_name": "HCC Screening",
+      "value": "No HCC detected",
+      "unit": "",
+      "reference_range": "No HCC",
+      "flag": "NORMAL",
+      "category": "Hepatic",
+      "source": "CT Scan of Liver",
+      "status": "resolved"
+    },
+    {
+      "date": "2025-06-03",
+      "test_name": "Pancreatic Cysts",
+      "value": "6mm + 9mm at tail",
+      "unit": "mm",
+      "reference_range": "No cysts",
+      "flag": "WATCH",
+      "category": "GI",
+      "source": "CT Scan of Liver",
+      "status": "monitoring"
+    },
+    {
+      "date": "2025-06-03",
+      "test_name": "Renal Calculi - Left",
+      "value": "5 stones (2-3mm)",
+      "unit": "mm",
+      "reference_range": "No stones",
+      "flag": "WATCH",
+      "category": "Renal",
+      "source": "CT Scan of Liver",
+      "status": "monitoring"
+    },
+    {
+      "date": "2025-06-03",
+      "test_name": "Renal Calculi - Right",
+      "value": "2 stones (3mm)",
+      "unit": "mm",
+      "reference_range": "No stones",
+      "flag": "WATCH",
+      "category": "Renal",
+      "source": "CT Scan of Liver",
+      "status": "monitoring"
+    },
+    {
+      "date": "2025-12-02",
+      "test_name": "Ferritin",
+      "value": 23,
+      "unit": "ng/mL",
+      "reference_range": "38-380 ng/mL",
+      "flag": "CRITICAL",
+      "category": "Hematology",
+      "source": "Health Intelligence Report",
+      "status": "active"
+    },
+    {
+      "date": "2025-12-02",
+      "test_name": "MCHC",
+      "value": 29.7,
+      "unit": "g/dL",
+      "reference_range": "32.0-36.0 g/dL",
+      "flag": "LOW",
+      "category": "Hematology",
+      "source": "Health Intelligence Report",
+      "status": "active"
+    },
+    {
+      "date": "2025-12-02",
+      "test_name": "Abs Reticulocytes",
+      "value": 95200,
+      "unit": "/uL",
+      "reference_range": "25,000-90,000 /uL",
+      "flag": "HIGH",
+      "category": "Hematology",
+      "source": "Health Intelligence Report",
+      "status": "active"
+    },
+    {
+      "date": "2025-12-02",
+      "test_name": "Hemoglobin",
+      "value": 15.0,
+      "unit": "g/dL",
+      "reference_range": "13.5-17.5 g/dL",
+      "flag": "NORMAL",
+      "category": "Hematology",
+      "source": "Health Intelligence Report",
+      "status": "resolved"
+    }
+  ],
+  "protocols": [
+    {
+      "name": "Astragalus membranaceus",
+      "purpose": "CD8/thymic support",
+      "status": "active",
+      "start_date": "2019-09-01",
+      "targets": ["CD8 T-cells", "CD4/CD8 Ratio"],
+      "notes": "Primary adaptogen for immune reconstitution"
+    },
+    {
+      "name": "Andrographis paniculata",
+      "purpose": "CD8/antiviral support",
+      "status": "active",
+      "start_date": "2019-09-01",
+      "targets": ["CD8 T-cells"],
+      "notes": "Synergistic with Astragalus for T-cell modulation"
+    },
+    {
+      "name": "Trametes versicolor (PSK/PSP)",
+      "purpose": "CD8 + NK cell augmentation",
+      "status": "active",
+      "start_date": "2019-09-01",
+      "targets": ["CD8 T-cells", "NK Cells"],
+      "notes": "Turkey tail mushroom — immune surveillance support"
+    },
+    {
+      "name": "Curcumin BCM-95",
+      "purpose": "TNF-alpha modulation",
+      "status": "active",
+      "start_date": "2019-09-01",
+      "targets": ["TNF-alpha", "hsCRP"],
+      "notes": "High-bioavailability curcumin formulation"
+    },
+    {
+      "name": "Boswellia serrata",
+      "purpose": "TNF-alpha / NF-kB suppression",
+      "status": "active",
+      "start_date": "2019-09-01",
+      "targets": ["TNF-alpha"],
+      "notes": "Frankincense extract — anti-inflammatory cascade"
+    },
+    {
+      "name": "Omega-3 EPA/DHA",
+      "purpose": "Systemic inflammation reduction",
+      "status": "active",
+      "start_date": "2019-09-01",
+      "targets": ["hsCRP", "TNF-alpha"],
+      "notes": "High-dose fish oil for resolvin production"
+    },
+    {
+      "name": "L-Glutamine + Zinc Carnosine",
+      "purpose": "Gut/mucosal repair",
+      "status": "active",
+      "start_date": "2024-05-01",
+      "targets": ["Stool Calprotectin"],
+      "notes": "Intestinal permeability and mucosal integrity"
+    },
+    {
+      "name": "Zinc + Selenium",
+      "purpose": "Thymic peptide support",
+      "status": "active",
+      "start_date": "2019-09-01",
+      "targets": ["CD8 T-cells", "CD4/CD8 Ratio"],
+      "notes": "Essential cofactors for thymic hormone synthesis"
+    }
+  ],
+  "metadata": {
+    "patient_name": "Daniel M. Phend, ND, MH",
+    "practice": "Future Body Sciences",
+    "location": "La Porte, Indiana",
+    "primary_physician": "Dr. Catherine Dos Santos",
+    "last_sync": "2025-12-02T00:00:00",
+    "total_findings": 29,
+    "created": "2026-03-28"
+  }
+}
