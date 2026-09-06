@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import Header from './components/Header'
+import BottomNav from './components/BottomNav'
 import Dashboard from './components/Dashboard'
 import Records from './components/Records'
 import Trends from './components/Trends'
@@ -8,11 +9,6 @@ import Letters from './components/Letters'
 import Protocols from './components/Protocols'
 import Consult from './components/Consult'
 import hermesData from './data/hermes_data.json'
-
-const TABS = [
-  'Dashboard', 'Records', 'Trends', 'Analyze',
-  'Letters', 'Protocols', 'Consult', 'Briefing'
-]
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('Dashboard')
@@ -34,10 +30,11 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-hermes-bg">
-      <Header activeTab={activeTab} setActiveTab={setActiveTab} tabs={TABS} />
-      <main className="max-w-7xl mx-auto px-4 py-6">
+      <Header />
+      <main className="max-w-4xl mx-auto px-4 py-4 pb-24">
         {renderTab()}
       </main>
+      <BottomNav activeTab={activeTab} setActiveTab={setActiveTab} />
     </div>
   )
 }
@@ -81,58 +78,55 @@ function Briefing({ data }) {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-fade-in">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-display text-hermes-gold">Pre-Appointment Briefing</h2>
+        <h2 className="text-xl font-display text-hermes-gold">Pre-Appointment Briefing</h2>
         <button
           onClick={generateBriefing}
           disabled={loading}
-          className="px-6 py-3 bg-hermes-gold text-hermes-bg rounded font-ui text-sm font-bold hover:bg-yellow-500 transition-colors disabled:opacity-50"
+          className="px-5 py-2.5 gradient-gold text-hermes-bg rounded-xl font-ui text-sm font-bold hover:opacity-90 transition-opacity disabled:opacity-50"
         >
-          {loading ? 'Generating...' : 'Prepare for Appointment'}
+          {loading ? 'Generating...' : 'Prepare'}
         </button>
       </div>
 
       {briefing && (
-        <div className="bg-hermes-card border border-hermes-border rounded-lg p-8 space-y-8 print:bg-white print:text-black">
+        <div className="bg-hermes-card border border-hermes-border rounded-2xl p-6 space-y-6 print:bg-white print:text-black">
           <div className="text-center border-b border-hermes-border pb-4">
-            <h3 className="text-xl font-display text-hermes-gold">HERMES Pre-Appointment Briefing</h3>
-            <p className="text-hermes-muted font-ui text-sm mt-1">{briefing.date}</p>
-            <p className="text-hermes-text mt-1">Prepared for appointment with {briefing.physician}</p>
+            <h3 className="text-lg font-display text-hermes-gold">HERMES Pre-Appointment Briefing</h3>
+            <p className="text-hermes-muted font-ui text-xs mt-1">{briefing.date}</p>
+            <p className="text-hermes-text text-sm mt-1">Prepared for {briefing.physician}</p>
           </div>
 
           <div>
-            <h4 className="text-lg font-display text-hermes-critical mb-3">Top Urgent Items to Discuss</h4>
+            <h4 className="font-display text-hermes-critical mb-3">Urgent Items to Discuss</h4>
             <div className="space-y-2">
               {briefing.urgentItems.map((item, i) => (
-                <div key={i} className="flex items-center gap-3 bg-hermes-surface p-3 rounded">
-                  <span className="text-hermes-critical font-ui text-sm font-bold">{i + 1}.</span>
-                  <div>
-                    <span className="font-bold">{item.finding}</span>
-                    <span className="text-hermes-muted ml-2">{item.value}</span>
-                    <span className="text-hermes-muted ml-2 font-ui text-xs">({item.date})</span>
-                    <span className={`ml-2 px-2 py-0.5 rounded text-xs font-ui ${item.flag === 'CRITICAL' ? 'bg-red-900/50 text-hermes-critical' : 'bg-orange-900/50 text-hermes-high'}`}>
-                      {item.flag}
-                    </span>
+                <div key={i} className="flex items-center gap-3 bg-red-950/30 rounded-xl p-3">
+                  <span className="w-6 h-6 rounded-full gradient-red flex items-center justify-center text-white text-xs font-bold">{i + 1}</span>
+                  <div className="flex-1">
+                    <span className="font-bold text-sm">{item.finding}</span>
+                    <span className="text-hermes-muted ml-2 text-sm">{item.value}</span>
                   </div>
+                  <span className="text-hermes-muted font-ui text-xs">{item.date}</span>
                 </div>
               ))}
             </div>
           </div>
 
           <div>
-            <h4 className="text-lg font-display text-hermes-blue mb-3">Recent Lab Changes</h4>
+            <h4 className="font-display text-hermes-blue mb-3">Recent Lab Changes</h4>
             <div className="space-y-1">
               {briefing.recentChanges.map((item, i) => (
-                <div key={i} className="flex items-center gap-3 text-sm font-ui">
+                <div key={i} className="flex items-center gap-3 text-sm font-ui py-1.5 px-3 rounded-lg hover:bg-hermes-surface/50">
                   <span className="text-hermes-muted w-24">{item.date}</span>
-                  <span className="text-hermes-text">{item.test}: {item.value}</span>
-                  <span className={`px-2 py-0.5 rounded text-xs ${
-                    item.flag === 'CRITICAL' ? 'bg-red-900/50 text-hermes-critical' :
-                    item.flag === 'HIGH' ? 'bg-orange-900/50 text-hermes-high' :
-                    item.flag === 'LOW' ? 'bg-blue-900/50 text-hermes-low' :
-                    item.flag === 'WATCH' ? 'bg-yellow-900/50 text-hermes-watch' :
-                    'bg-green-900/50 text-hermes-normal'
+                  <span className="text-hermes-text flex-1">{item.test}: {item.value}</span>
+                  <span className={`px-2 py-0.5 rounded-full text-[10px] ${
+                    item.flag === 'CRITICAL' ? 'bg-red-500/15 text-red-400' :
+                    item.flag === 'HIGH' ? 'bg-orange-500/15 text-orange-400' :
+                    item.flag === 'LOW' ? 'bg-blue-500/15 text-blue-400' :
+                    item.flag === 'WATCH' ? 'bg-yellow-500/15 text-yellow-400' :
+                    'bg-green-500/15 text-green-400'
                   }`}>{item.flag}</span>
                 </div>
               ))}
@@ -140,11 +134,11 @@ function Briefing({ data }) {
           </div>
 
           <div>
-            <h4 className="text-lg font-display text-hermes-teal mb-3">Suggested Questions for the Doctor</h4>
+            <h4 className="font-display text-hermes-teal mb-3">Suggested Questions</h4>
             <ul className="space-y-2">
               {briefing.suggestedQuestions.map((q, i) => (
-                <li key={i} className="flex items-start gap-2">
-                  <span className="text-hermes-gold mt-1">&#9670;</span>
+                <li key={i} className="flex items-start gap-2 text-sm">
+                  <span className="text-hermes-gold mt-0.5">&#9670;</span>
                   <span>{q}</span>
                 </li>
               ))}
@@ -152,18 +146,20 @@ function Briefing({ data }) {
           </div>
 
           <div>
-            <h4 className="text-lg font-display text-hermes-normal mb-3">Active Protocol Summary</h4>
-            <ul className="grid grid-cols-2 gap-1">
+            <h4 className="font-display text-hermes-normal mb-3">Active Protocols</h4>
+            <div className="flex flex-wrap gap-2">
               {briefing.activeProtocols.map((p, i) => (
-                <li key={i} className="text-sm font-ui text-hermes-muted">&#8226; {p}</li>
+                <span key={i} className="text-xs font-ui text-hermes-muted bg-hermes-surface rounded-full px-3 py-1">
+                  {p}
+                </span>
               ))}
-            </ul>
+            </div>
           </div>
 
           <div className="flex gap-3 pt-4 border-t border-hermes-border print:hidden">
             <button
               onClick={() => window.print()}
-              className="px-4 py-2 bg-hermes-surface border border-hermes-border rounded font-ui text-sm hover:border-hermes-gold transition-colors"
+              className="px-4 py-2 bg-hermes-surface border border-hermes-border rounded-xl font-ui text-sm hover:border-hermes-gold transition-colors"
             >
               Print Briefing
             </button>
@@ -172,9 +168,12 @@ function Briefing({ data }) {
       )}
 
       {!briefing && (
-        <div className="bg-hermes-card border border-hermes-border rounded-lg p-12 text-center">
-          <p className="text-hermes-muted text-lg">Click "Prepare for Appointment" to generate your pre-appointment briefing.</p>
-          <p className="text-hermes-muted mt-2">HERMES will compile your most urgent items, recent lab changes, and suggested discussion points.</p>
+        <div className="bg-hermes-card border border-hermes-border rounded-2xl p-10 text-center">
+          <div className="gradient-orange w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <span className="text-2xl">&#128203;</span>
+          </div>
+          <p className="text-hermes-text text-base">Ready to prepare for your appointment?</p>
+          <p className="text-hermes-muted text-sm mt-2">HERMES will compile your urgent items, recent labs, and talking points.</p>
         </div>
       )}
     </div>

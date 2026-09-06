@@ -1,11 +1,12 @@
 import React, { useState } from 'react'
+import { FlaskConical, Plus, TrendingUp } from 'lucide-react'
 
 const FLAG_COLORS = {
-  CRITICAL: 'text-red-400',
-  HIGH: 'text-orange-400',
-  LOW: 'text-blue-400',
-  WATCH: 'text-yellow-400',
-  NORMAL: 'text-green-400',
+  CRITICAL: 'text-red-400 bg-red-500/15',
+  HIGH: 'text-orange-400 bg-orange-500/15',
+  LOW: 'text-blue-400 bg-blue-500/15',
+  WATCH: 'text-yellow-400 bg-yellow-500/15',
+  NORMAL: 'text-green-400 bg-green-500/15',
 }
 
 export default function Analyze({ data, setData }) {
@@ -71,9 +72,7 @@ Return ONLY valid JSON, no other text.`,
         })
       })
 
-      if (!response.ok) {
-        throw new Error(`API error: ${response.status}`)
-      }
+      if (!response.ok) throw new Error(`API error: ${response.status}`)
 
       const result = await response.json()
       const text = result.content[0].text
@@ -111,31 +110,35 @@ Return ONLY valid JSON, no other text.`,
   }
 
   return (
-    <div className="space-y-6">
-      <h2 className="text-2xl font-display text-hermes-gold">Lab Analysis</h2>
+    <div className="space-y-5 animate-fade-in">
+      <h2 className="text-xl font-display text-hermes-gold">Lab Analysis</h2>
 
-      {/* Input Area */}
-      <div className="bg-hermes-card border border-hermes-border rounded-lg p-5 space-y-4">
-        <p className="text-hermes-muted text-sm">
-          Paste your lab results below and HERMES will extract values, flag abnormals,
-          compare to your history, and check for herb-drug interactions.
-        </p>
+      {/* Input */}
+      <div className="bg-hermes-card border border-hermes-border rounded-2xl p-5 space-y-4">
+        <div className="flex items-center gap-3 mb-2">
+          <div className="p-2 rounded-xl gradient-purple">
+            <FlaskConical size={18} className="text-purple-200" />
+          </div>
+          <p className="text-hermes-muted text-sm">
+            Paste lab results and HERMES will extract, flag, compare, and check interactions.
+          </p>
+        </div>
         <textarea
           value={labText}
           onChange={e => setLabText(e.target.value)}
           placeholder="Paste your raw lab results here..."
-          rows={10}
-          className="w-full bg-hermes-surface border border-hermes-border rounded p-4 font-ui text-sm text-hermes-text placeholder-hermes-muted focus:border-hermes-gold focus:outline-none resize-y"
+          rows={8}
+          className="w-full bg-hermes-surface border border-hermes-border rounded-xl p-4 font-ui text-sm text-hermes-text placeholder-hermes-muted focus:border-hermes-gold focus:outline-none resize-y"
         />
         <div className="flex gap-3">
           <button
             onClick={parseWithHermes}
             disabled={loading || !labText.trim()}
-            className="px-6 py-3 bg-hermes-gold text-hermes-bg rounded font-ui text-sm font-bold hover:bg-yellow-500 transition-colors disabled:opacity-50"
+            className="px-5 py-2.5 gradient-gold text-hermes-bg rounded-xl font-ui text-sm font-bold hover:opacity-90 transition-opacity disabled:opacity-50"
           >
             {loading ? 'Parsing...' : 'Parse with HERMES'}
           </button>
-          <label className="px-6 py-3 bg-hermes-surface border border-hermes-border rounded font-ui text-sm text-hermes-muted cursor-pointer hover:border-hermes-gold transition-colors flex items-center">
+          <label className="px-5 py-2.5 bg-hermes-surface border border-hermes-border rounded-xl font-ui text-sm text-hermes-muted cursor-pointer hover:border-hermes-gold transition-colors flex items-center">
             Upload PDF
             <input
               type="file"
@@ -152,36 +155,32 @@ Return ONLY valid JSON, no other text.`,
         </div>
       </div>
 
-      {/* Error */}
       {error && (
-        <div className="bg-red-950/50 border border-red-800 rounded-lg p-4">
+        <div className="bg-red-950/30 border border-red-800/50 rounded-2xl p-4">
           <p className="text-red-400 font-ui text-sm">{error}</p>
         </div>
       )}
 
-      {/* Results */}
       {results && (
         <div className="space-y-4">
-          {/* Extracted Values */}
           {results.findings && (
-            <div className="bg-hermes-card border border-hermes-border rounded-lg p-5">
+            <div className="bg-hermes-card border border-hermes-border rounded-2xl p-5">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="font-display text-lg text-hermes-gold">Extracted Values</h3>
+                <h3 className="font-display text-base text-hermes-gold">Extracted Values</h3>
                 <button
                   onClick={addToRecords}
-                  className="px-4 py-2 bg-hermes-normal/20 text-hermes-normal border border-hermes-normal/30 rounded font-ui text-xs hover:bg-hermes-normal/30 transition-colors"
+                  className="flex items-center gap-1.5 px-4 py-2 bg-green-900/20 text-green-400 border border-green-800/30 rounded-xl font-ui text-xs hover:bg-green-900/30 transition-colors"
                 >
-                  Add to Records
+                  <Plus size={14} /> Add to Records
                 </button>
               </div>
               <div className="space-y-2">
                 {results.findings.map((f, i) => (
-                  <div key={i} className="flex items-center gap-4 bg-hermes-surface rounded p-3">
-                    <span className="font-ui text-xs text-hermes-muted w-24">{f.date}</span>
+                  <div key={i} className="flex items-center gap-3 bg-hermes-surface rounded-xl p-3">
+                    <span className="font-ui text-[10px] text-hermes-muted w-20">{f.date}</span>
                     <span className="font-bold text-sm flex-1">{f.test_name}</span>
-                    <span className="font-ui text-sm">{f.value} {f.unit}</span>
-                    <span className="font-ui text-xs text-hermes-muted">{f.reference_range}</span>
-                    <span className={`font-ui text-xs font-bold ${FLAG_COLORS[f.flag] || ''}`}>
+                    <span className="font-ui text-sm">{f.value} <span className="text-hermes-muted text-xs">{f.unit}</span></span>
+                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-ui font-medium ${FLAG_COLORS[f.flag] || ''}`}>
                       {f.flag}
                     </span>
                   </div>
@@ -190,28 +189,24 @@ Return ONLY valid JSON, no other text.`,
             </div>
           )}
 
-          {/* Analysis */}
           {results.analysis && (
-            <div className="bg-hermes-card border border-hermes-border rounded-lg p-5 space-y-4">
-              <h3 className="font-display text-lg text-hermes-gold">HERMES Analysis</h3>
+            <div className="bg-hermes-card border border-hermes-border rounded-2xl p-5 space-y-4">
+              <h3 className="font-display text-base text-hermes-gold">HERMES Analysis</h3>
 
               {results.analysis.summary && (
-                <div>
-                  <h4 className="font-ui text-xs text-hermes-muted tracking-wide mb-1">SUMMARY</h4>
-                  <p className="text-sm">{results.analysis.summary}</p>
+                <div className="bg-hermes-surface rounded-xl p-4">
+                  <p className="text-sm leading-relaxed">{results.analysis.summary}</p>
                 </div>
               )}
 
               {results.analysis.trend_arrows?.length > 0 && (
                 <div>
-                  <h4 className="font-ui text-xs text-hermes-muted tracking-wide mb-2">TREND DIRECTION</h4>
-                  <div className="flex flex-wrap gap-3">
+                  <p className="font-ui text-[10px] text-hermes-muted tracking-wider mb-2">TRENDS</p>
+                  <div className="flex flex-wrap gap-2">
                     {results.analysis.trend_arrows.map((t, i) => (
-                      <span key={i} className="bg-hermes-surface rounded px-3 py-1 font-ui text-sm">
+                      <span key={i} className="flex items-center gap-1.5 bg-hermes-surface rounded-full px-3 py-1.5 font-ui text-xs">
+                        <TrendingUp size={12} className={t.direction === 'up' ? 'text-red-400' : t.direction === 'down' ? 'text-blue-400' : 'text-hermes-muted'} />
                         {t.test}
-                        <span className="ml-2">
-                          {t.direction === 'up' ? '&#8593;' : t.direction === 'down' ? '&#8595;' : '&#8596;'}
-                        </span>
                       </span>
                     ))}
                   </div>
@@ -219,24 +214,27 @@ Return ONLY valid JSON, no other text.`,
               )}
 
               {results.analysis.interpretation && (
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div>
-                    <h4 className="font-ui text-xs text-hermes-muted tracking-wide mb-1">CONVENTIONAL</h4>
+                <div className="grid md:grid-cols-2 gap-3">
+                  <div className="bg-hermes-surface rounded-xl p-4">
+                    <p className="font-ui text-[10px] text-hermes-muted tracking-wider mb-1">CONVENTIONAL</p>
                     <p className="text-sm">{results.analysis.interpretation.conventional}</p>
                   </div>
-                  <div>
-                    <h4 className="font-ui text-xs text-hermes-teal tracking-wide mb-1">NATUROPATHIC</h4>
+                  <div className="bg-hermes-surface rounded-xl p-4 border-l-2 border-hermes-teal">
+                    <p className="font-ui text-[10px] text-hermes-teal tracking-wider mb-1">NATUROPATHIC</p>
                     <p className="text-sm">{results.analysis.interpretation.naturopathic}</p>
                   </div>
                 </div>
               )}
 
               {results.analysis.interactions?.length > 0 && (
-                <div>
-                  <h4 className="font-ui text-xs text-hermes-high tracking-wide mb-1">&#9888; HERB-DRUG INTERACTIONS</h4>
+                <div className="bg-orange-950/20 border border-orange-800/30 rounded-xl p-4">
+                  <p className="font-ui text-[10px] text-hermes-high tracking-wider mb-2">HERB-DRUG INTERACTIONS</p>
                   <ul className="space-y-1">
                     {results.analysis.interactions.map((x, i) => (
-                      <li key={i} className="text-sm text-hermes-high">&#8226; {x}</li>
+                      <li key={i} className="text-sm text-hermes-high flex items-start gap-2">
+                        <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-orange-400 shrink-0" />
+                        {x}
+                      </li>
                     ))}
                   </ul>
                 </div>
@@ -244,10 +242,13 @@ Return ONLY valid JSON, no other text.`,
 
               {results.analysis.recommended_followup?.length > 0 && (
                 <div>
-                  <h4 className="font-ui text-xs text-hermes-blue tracking-wide mb-1">RECOMMENDED FOLLOW-UP</h4>
+                  <p className="font-ui text-[10px] text-hermes-blue tracking-wider mb-2">RECOMMENDED FOLLOW-UP</p>
                   <ul className="space-y-1">
                     {results.analysis.recommended_followup.map((r, i) => (
-                      <li key={i} className="text-sm text-hermes-blue">&#8226; {r}</li>
+                      <li key={i} className="text-sm text-hermes-blue flex items-start gap-2">
+                        <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-blue-400 shrink-0" />
+                        {r}
+                      </li>
                     ))}
                   </ul>
                 </div>

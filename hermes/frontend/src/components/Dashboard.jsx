@@ -1,12 +1,23 @@
 import React from 'react'
+import {
+  AlertTriangle,
+  Activity,
+  Shield,
+  Leaf,
+  TrendingUp,
+  MessageCircle,
+  FlaskConical,
+  Mail,
+  ChevronRight,
+} from 'lucide-react'
 
 const FLAG_COLORS = {
-  CRITICAL: 'bg-red-900/50 text-red-400 border-red-800',
-  URGENT: 'bg-red-900/50 text-red-400 border-red-800',
-  HIGH: 'bg-orange-900/50 text-orange-400 border-orange-800',
-  LOW: 'bg-blue-900/50 text-blue-400 border-blue-800',
-  WATCH: 'bg-yellow-900/50 text-yellow-400 border-yellow-800',
-  NORMAL: 'bg-green-900/50 text-green-400 border-green-800',
+  CRITICAL: { bg: 'bg-red-500/15', text: 'text-red-400', dot: 'bg-red-400' },
+  URGENT: { bg: 'bg-red-500/15', text: 'text-red-400', dot: 'bg-red-400' },
+  HIGH: { bg: 'bg-orange-500/15', text: 'text-orange-400', dot: 'bg-orange-400' },
+  LOW: { bg: 'bg-blue-500/15', text: 'text-blue-400', dot: 'bg-blue-400' },
+  WATCH: { bg: 'bg-yellow-500/15', text: 'text-yellow-400', dot: 'bg-yellow-400' },
+  NORMAL: { bg: 'bg-green-500/15', text: 'text-green-400', dot: 'bg-green-400' },
 }
 
 export default function Dashboard({ data, onNavigate }) {
@@ -16,99 +27,196 @@ export default function Dashboard({ data, onNavigate }) {
   const criticalFlags = findings.filter(f => ['CRITICAL', 'URGENT'].includes(f.flag))
   const activeIssues = findings.filter(f => f.status === 'active')
   const activeProtocols = protocols.filter(p => p.status === 'active')
-  const recentFindings = findings.slice(0, 8)
+  const recentFindings = findings.slice(0, 6)
 
   return (
-    <div className="space-y-6">
-      {/* Critical Flags Banner */}
+    <div className="space-y-5 animate-fade-in">
+      {/* Critical Alert Banner */}
       {criticalFlags.length > 0 && (
-        <div className="bg-red-950/60 border border-red-800 rounded-lg p-4 pulse-alert">
+        <div className="gradient-red rounded-2xl p-4 pulse-alert">
           <div className="flex items-center gap-2 mb-3">
-            <span className="text-red-400 text-lg">&#9888;</span>
-            <h3 className="text-red-400 font-ui text-sm font-bold tracking-wide">
-              CRITICAL FLAGS ({criticalFlags.length})
-            </h3>
+            <AlertTriangle size={18} className="text-red-300" />
+            <span className="text-red-200 font-ui text-xs font-bold tracking-wider">
+              {criticalFlags.length} CRITICAL {criticalFlags.length === 1 ? 'FLAG' : 'FLAGS'}
+            </span>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-            {criticalFlags.map((f, i) => (
-              <div key={i} className="flex items-center gap-3 bg-red-950/40 rounded p-2">
-                <span className="text-red-400 font-ui text-xs font-bold">{f.date}</span>
-                <span className="text-hermes-text text-sm">{f.test_name}</span>
-                <span className="text-red-400 font-ui text-xs">
-                  {f.value} {f.unit}
-                </span>
+          <div className="space-y-1.5">
+            {criticalFlags.slice(0, 3).map((f, i) => (
+              <div key={i} className="flex items-center gap-3 bg-black/20 rounded-lg px-3 py-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-red-400 shrink-0" />
+                <span className="text-white text-sm font-medium">{f.test_name}</span>
+                <span className="text-red-200 font-ui text-xs ml-auto">{f.date}</span>
               </div>
             ))}
           </div>
         </div>
       )}
 
-      {/* Stats Row */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <StatCard label="Total Findings" value={findings.length} color="text-hermes-blue" />
-        <StatCard label="Active Issues" value={activeIssues.length} color="text-hermes-high" />
-        <StatCard label="Critical Flags" value={criticalFlags.length} color="text-hermes-critical" />
-        <StatCard label="Active Protocols" value={activeProtocols.length} color="text-hermes-normal" />
+      {/* Stats Grid */}
+      <div className="grid grid-cols-2 gap-3">
+        <StatCard
+          label="Findings"
+          value={findings.length}
+          icon={Activity}
+          gradient="gradient-blue"
+          iconColor="#6DB3F8"
+        />
+        <StatCard
+          label="Active Issues"
+          value={activeIssues.length}
+          icon={AlertTriangle}
+          gradient="gradient-orange"
+          iconColor="#F0A050"
+        />
+        <StatCard
+          label="Critical"
+          value={criticalFlags.length}
+          icon={Shield}
+          gradient="gradient-red"
+          iconColor="#FF6666"
+        />
+        <StatCard
+          label="Protocols"
+          value={activeProtocols.length}
+          icon={Leaf}
+          gradient="gradient-green"
+          iconColor="#72E49A"
+        />
       </div>
 
       {/* Quick Actions */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <QuickAction label="Consult HERMES" icon="&#9741;" onClick={() => onNavigate('Consult')} />
-        <QuickAction label="Upload Labs" icon="&#8682;" onClick={() => onNavigate('Analyze')} />
-        <QuickAction label="Generate Letter" icon="&#9993;" onClick={() => onNavigate('Letters')} />
-        <QuickAction label="View Trends" icon="&#8599;" onClick={() => onNavigate('Trends')} />
+      <div className="grid grid-cols-2 gap-3">
+        <QuickAction
+          label="Consult HERMES"
+          desc="Chat with your AI advisor"
+          icon={MessageCircle}
+          color="#E8C66A"
+          bgClass="bg-hermes-gold/10 border-hermes-gold/20"
+          onClick={() => onNavigate('Consult')}
+        />
+        <QuickAction
+          label="View Trends"
+          desc="Track your markers"
+          icon={TrendingUp}
+          color="#3ABFBF"
+          bgClass="bg-hermes-teal/10 border-hermes-teal/20"
+          onClick={() => onNavigate('Trends')}
+        />
+        <QuickAction
+          label="Upload Labs"
+          desc="Analyze new results"
+          icon={FlaskConical}
+          color="#9B7BFF"
+          bgClass="bg-hermes-purple/10 border-hermes-purple/20"
+          onClick={() => onNavigate('Analyze')}
+        />
+        <QuickAction
+          label="Write Letter"
+          desc="Generate for doctor"
+          icon={Mail}
+          color="#E06B9F"
+          bgClass="bg-hermes-pink/10 border-hermes-pink/20"
+          onClick={() => onNavigate('Letters')}
+        />
       </div>
 
       {/* Recent Activity */}
-      <div className="bg-hermes-card border border-hermes-border rounded-lg p-5">
-        <h3 className="text-hermes-gold font-display text-lg mb-4">Recent Activity</h3>
-        <div className="space-y-2">
-          {recentFindings.map((f, i) => (
-            <div key={i} className="flex items-center justify-between py-2 border-b border-hermes-border/50 last:border-0">
-              <div className="flex items-center gap-3">
-                <span className="text-hermes-muted font-ui text-xs w-24">{f.date}</span>
-                <span className="text-hermes-text text-sm">{f.test_name}</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <span className="text-hermes-muted font-ui text-xs">
-                  {f.value} {f.unit}
+      <div className="bg-hermes-card border border-hermes-border rounded-2xl p-4">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-hermes-gold font-display text-base">Recent Activity</h3>
+          <button
+            onClick={() => onNavigate('Records')}
+            className="flex items-center gap-1 text-hermes-muted font-ui text-xs hover:text-hermes-gold transition-colors"
+          >
+            View all <ChevronRight size={14} />
+          </button>
+        </div>
+        <div className="space-y-1">
+          {recentFindings.map((f, i) => {
+            const flagStyle = FLAG_COLORS[f.flag] || FLAG_COLORS.NORMAL
+            return (
+              <div
+                key={i}
+                className="flex items-center gap-3 py-2.5 px-3 rounded-xl hover:bg-hermes-surface/50 transition-colors"
+              >
+                <span className={`w-2 h-2 rounded-full shrink-0 ${flagStyle.dot}`} />
+                <div className="flex-1 min-w-0">
+                  <p className="text-hermes-text text-sm truncate">{f.test_name}</p>
+                  <p className="text-hermes-muted font-ui text-[10px]">{f.date}</p>
+                </div>
+                <span className="text-hermes-muted font-ui text-xs whitespace-nowrap">
+                  {typeof f.value === 'string' && f.value.length > 15
+                    ? f.value.slice(0, 15) + '...'
+                    : `${f.value} ${f.unit}`}
                 </span>
-                <span className={`px-2 py-0.5 rounded text-xs font-ui border ${FLAG_COLORS[f.flag] || FLAG_COLORS.NORMAL}`}>
+                <span className={`px-2 py-0.5 rounded-full text-[10px] font-ui font-medium ${flagStyle.bg} ${flagStyle.text}`}>
                   {f.flag}
                 </span>
               </div>
+            )
+          })}
+        </div>
+      </div>
+
+      {/* Active Protocols Preview */}
+      <div className="bg-hermes-card border border-hermes-border rounded-2xl p-4">
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-hermes-gold font-display text-base">Active Protocols</h3>
+          <button
+            onClick={() => onNavigate('Protocols')}
+            className="flex items-center gap-1 text-hermes-muted font-ui text-xs hover:text-hermes-gold transition-colors"
+          >
+            Manage <ChevronRight size={14} />
+          </button>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {activeProtocols.map((p, i) => (
+            <div
+              key={i}
+              className="flex items-center gap-2 bg-green-900/20 border border-green-800/30 rounded-full px-3 py-1.5"
+            >
+              <Leaf size={12} className="text-green-400" />
+              <span className="text-green-300 text-xs font-medium">{p.name.split(' ')[0]}</span>
             </div>
           ))}
         </div>
       </div>
 
-      {/* Metadata */}
-      <div className="text-center text-hermes-muted font-ui text-xs">
-        Last sync: {data.metadata?.last_sync || 'Never'} &middot;
-        Patient: {data.metadata?.patient_name || 'Unknown'} &middot;
-        Primary: {data.metadata?.primary_physician || 'Unknown'}
+      {/* Footer Info */}
+      <div className="text-center pb-2">
+        <p className="text-hermes-muted font-ui text-[10px]">
+          {data.metadata?.patient_name} &middot; {data.metadata?.primary_physician} &middot; Last sync {data.metadata?.last_sync?.split('T')[0] || 'Never'}
+        </p>
       </div>
     </div>
   )
 }
 
-function StatCard({ label, value, color }) {
+function StatCard({ label, value, icon: Icon, gradient, iconColor }) {
   return (
-    <div className="bg-hermes-card border border-hermes-border rounded-lg p-4">
-      <p className="text-hermes-muted font-ui text-xs tracking-wide mb-1">{label.toUpperCase()}</p>
-      <p className={`text-3xl font-display font-bold ${color}`}>{value}</p>
+    <div className={`${gradient} rounded-2xl p-4 card-glow transition-all duration-200`}>
+      <div className="flex items-start justify-between">
+        <div>
+          <p className="text-white/60 font-ui text-[10px] tracking-wider uppercase">{label}</p>
+          <p className="text-white text-3xl font-display font-bold mt-1">{value}</p>
+        </div>
+        <div className="p-2 rounded-xl bg-white/10">
+          <Icon size={20} color={iconColor} />
+        </div>
+      </div>
     </div>
   )
 }
 
-function QuickAction({ label, icon, onClick }) {
+function QuickAction({ label, desc, icon: Icon, color, bgClass, onClick }) {
   return (
     <button
       onClick={onClick}
-      className="bg-hermes-surface border border-hermes-border rounded-lg p-4 text-center hover:border-hermes-gold hover:bg-hermes-card transition-all duration-200 group"
+      className={`${bgClass} border rounded-2xl p-4 text-left transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] card-glow group`}
     >
-      <span className="text-2xl block mb-1 group-hover:text-hermes-gold transition-colors">{icon}</span>
-      <span className="font-ui text-xs text-hermes-muted group-hover:text-hermes-text transition-colors">{label}</span>
+      <Icon size={24} color={color} className="mb-2" />
+      <p className="text-hermes-text text-sm font-medium">{label}</p>
+      <p className="text-hermes-muted text-xs mt-0.5">{desc}</p>
     </button>
   )
 }
