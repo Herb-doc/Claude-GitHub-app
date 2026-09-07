@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { Mail, Copy, Check } from 'lucide-react'
 
 const DOCTORS = [
   { name: 'Dr. Catherine Dos Santos', role: 'Primary Physician' },
@@ -10,6 +11,7 @@ export default function Letters({ data }) {
   const [doctor, setDoctor] = useState(DOCTORS[0].name)
   const [letter, setLetter] = useState(null)
   const [loading, setLoading] = useState(false)
+  const [copied, setCopied] = useState(false)
 
   const generateLetter = async () => {
     if (!purpose.trim()) return
@@ -79,21 +81,29 @@ Return the complete formatted letter text.`,
   const copyToClipboard = () => {
     if (letter) {
       navigator.clipboard.writeText(letter)
-      alert('Letter copied to clipboard!')
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
     }
   }
 
   return (
-    <div className="space-y-6">
-      <h2 className="text-2xl font-display text-hermes-gold">Doctor Letter Generator</h2>
+    <div className="space-y-5 animate-fade-in">
+      <h2 className="text-xl font-display text-hermes-gold">Doctor Letter Generator</h2>
 
-      <div className="bg-hermes-card border border-hermes-border rounded-lg p-5 space-y-4">
+      <div className="bg-hermes-card border border-hermes-border rounded-2xl p-5 space-y-4">
+        <div className="flex items-center gap-3 mb-2">
+          <div className="p-2 rounded-xl gradient-pink">
+            <Mail size={18} className="text-pink-200" />
+          </div>
+          <p className="text-hermes-muted text-sm">Generate professional physician letters with your data.</p>
+        </div>
+
         <div>
-          <label className="font-ui text-xs text-hermes-muted tracking-wide block mb-1">RECIPIENT</label>
+          <label className="font-ui text-[10px] text-hermes-muted tracking-wider block mb-1.5">RECIPIENT</label>
           <select
             value={doctor}
             onChange={e => setDoctor(e.target.value)}
-            className="bg-hermes-surface border border-hermes-border rounded px-3 py-2 font-ui text-sm text-hermes-text focus:border-hermes-gold focus:outline-none w-full md:w-96"
+            className="bg-hermes-surface border border-hermes-border rounded-xl px-4 py-2.5 font-ui text-sm text-hermes-text focus:border-hermes-gold focus:outline-none w-full"
           >
             {DOCTORS.map(d => (
               <option key={d.name} value={d.name}>{d.name} — {d.role}</option>
@@ -102,39 +112,38 @@ Return the complete formatted letter text.`,
         </div>
 
         <div>
-          <label className="font-ui text-xs text-hermes-muted tracking-wide block mb-1">PURPOSE / FOCUS</label>
+          <label className="font-ui text-[10px] text-hermes-muted tracking-wider block mb-1.5">PURPOSE / FOCUS</label>
           <textarea
             value={purpose}
             onChange={e => setPurpose(e.target.value)}
-            placeholder="Describe the purpose of this letter (e.g., 'Request referral for hepatology consult regarding cirrhosis findings, include iron deficiency data and current protocols')"
+            placeholder="Describe the purpose of this letter..."
             rows={4}
-            className="w-full bg-hermes-surface border border-hermes-border rounded p-3 font-ui text-sm text-hermes-text placeholder-hermes-muted focus:border-hermes-gold focus:outline-none resize-y"
+            className="w-full bg-hermes-surface border border-hermes-border rounded-xl p-4 font-ui text-sm text-hermes-text placeholder-hermes-muted focus:border-hermes-gold focus:outline-none resize-y"
           />
         </div>
 
         <button
           onClick={generateLetter}
           disabled={loading || !purpose.trim()}
-          className="px-6 py-3 bg-hermes-gold text-hermes-bg rounded font-ui text-sm font-bold hover:bg-yellow-500 transition-colors disabled:opacity-50"
+          className="px-5 py-2.5 gradient-gold text-hermes-bg rounded-xl font-ui text-sm font-bold hover:opacity-90 transition-opacity disabled:opacity-50"
         >
           {loading ? 'Generating...' : 'Generate Letter'}
         </button>
       </div>
 
       {letter && (
-        <div className="bg-hermes-card border border-hermes-border rounded-lg p-6 space-y-4">
+        <div className="bg-hermes-card border border-hermes-border rounded-2xl p-5 space-y-4">
           <div className="flex items-center justify-between">
-            <h3 className="font-display text-lg text-hermes-gold">Generated Letter</h3>
-            <div className="flex gap-2">
-              <button
-                onClick={copyToClipboard}
-                className="px-4 py-2 bg-hermes-surface border border-hermes-border rounded font-ui text-xs text-hermes-muted hover:border-hermes-gold transition-colors"
-              >
-                Copy to Clipboard
-              </button>
-            </div>
+            <h3 className="font-display text-base text-hermes-gold">Generated Letter</h3>
+            <button
+              onClick={copyToClipboard}
+              className="flex items-center gap-1.5 px-4 py-2 bg-hermes-surface border border-hermes-border rounded-xl font-ui text-xs text-hermes-muted hover:border-hermes-gold transition-colors"
+            >
+              {copied ? <Check size={14} className="text-green-400" /> : <Copy size={14} />}
+              {copied ? 'Copied' : 'Copy'}
+            </button>
           </div>
-          <div className="bg-hermes-surface rounded p-6 whitespace-pre-wrap font-display text-sm leading-relaxed">
+          <div className="bg-hermes-surface rounded-xl p-5 whitespace-pre-wrap font-display text-sm leading-relaxed">
             {letter}
           </div>
         </div>

@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react'
+import { MessageCircle, Send, KeyRound } from 'lucide-react'
 
 const SUGGESTED_QUESTIONS = [
   "What patterns concern you most in my current data?",
@@ -100,24 +101,29 @@ Respond with clinical depth appropriate for a fellow practitioner, but explain c
 
   if (showKeyInput) {
     return (
-      <div className="space-y-6">
-        <h2 className="text-2xl font-display text-hermes-gold">Consult HERMES</h2>
-        <div className="bg-hermes-card border border-hermes-border rounded-lg p-8 max-w-lg mx-auto space-y-4">
+      <div className="space-y-6 animate-fade-in">
+        <h2 className="text-xl font-display text-hermes-gold">Consult HERMES</h2>
+        <div className="bg-hermes-card border border-hermes-border rounded-2xl p-8 max-w-lg mx-auto space-y-5">
+          <div className="flex justify-center">
+            <div className="p-3 rounded-2xl gradient-gold">
+              <KeyRound size={28} className="text-yellow-900" />
+            </div>
+          </div>
           <p className="text-hermes-muted text-sm text-center">
-            Enter your Anthropic API key to start a consultation with HERMES.
-            Your key is stored only in this browser session and never sent to any server other than Anthropic's API.
+            Enter your Anthropic API key to start a consultation.
+            Your key stays in this browser session only.
           </p>
           <input
             type="password"
             value={apiKey}
             onChange={e => setApiKey(e.target.value)}
             placeholder="sk-ant-..."
-            className="w-full bg-hermes-surface border border-hermes-border rounded px-4 py-3 font-ui text-sm text-hermes-text placeholder-hermes-muted focus:border-hermes-gold focus:outline-none"
+            className="w-full bg-hermes-surface border border-hermes-border rounded-xl px-4 py-3 font-ui text-sm text-hermes-text placeholder-hermes-muted focus:border-hermes-gold focus:outline-none"
           />
           <button
             onClick={() => { if (apiKey.trim()) setShowKeyInput(false) }}
             disabled={!apiKey.trim()}
-            className="w-full px-6 py-3 bg-hermes-gold text-hermes-bg rounded font-ui text-sm font-bold hover:bg-yellow-500 transition-colors disabled:opacity-50"
+            className="w-full px-6 py-3 gradient-gold text-hermes-bg rounded-xl font-ui text-sm font-bold hover:opacity-90 transition-opacity disabled:opacity-50"
           >
             Start Consultation
           </button>
@@ -127,23 +133,28 @@ Respond with clinical depth appropriate for a fellow practitioner, but explain c
   }
 
   return (
-    <div className="flex flex-col h-[calc(100vh-8rem)]">
-      <h2 className="text-2xl font-display text-hermes-gold mb-4">Consult HERMES</h2>
+    <div className="flex flex-col h-[calc(100vh-10rem)] animate-fade-in">
+      <h2 className="text-xl font-display text-hermes-gold mb-3">Consult HERMES</h2>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto bg-hermes-card border border-hermes-border rounded-lg p-4 space-y-4 mb-4">
+      <div className="flex-1 overflow-y-auto bg-hermes-card border border-hermes-border rounded-2xl p-4 space-y-3 mb-3">
         {messages.length === 0 && (
-          <div className="text-center py-12 space-y-6">
-            <p className="text-hermes-gold font-display text-xl">Welcome, Daniel.</p>
+          <div className="text-center py-10 space-y-5">
+            <div className="flex justify-center">
+              <div className="p-3 rounded-2xl gradient-gold">
+                <MessageCircle size={28} className="text-yellow-900" />
+              </div>
+            </div>
+            <p className="text-hermes-gold font-display text-lg">Welcome, Daniel.</p>
             <p className="text-hermes-muted text-sm">
-              I have your complete health record loaded. What would you like to discuss?
+              Your complete health record is loaded. What would you like to discuss?
             </p>
             <div className="flex flex-wrap justify-center gap-2 max-w-2xl mx-auto">
               {SUGGESTED_QUESTIONS.map((q, i) => (
                 <button
                   key={i}
                   onClick={() => sendMessage(q)}
-                  className="px-3 py-2 bg-hermes-surface border border-hermes-border rounded text-sm text-hermes-muted hover:border-hermes-gold hover:text-hermes-text transition-all text-left"
+                  className="px-3 py-2 bg-hermes-surface border border-hermes-border rounded-xl text-xs text-hermes-muted hover:border-hermes-gold hover:text-hermes-text transition-all text-left"
                 >
                   {q}
                 </button>
@@ -154,13 +165,13 @@ Respond with clinical depth appropriate for a fellow practitioner, but explain c
 
         {messages.map((msg, i) => (
           <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-            <div className={`max-w-[80%] rounded-lg p-4 ${
+            <div className={`max-w-[80%] rounded-2xl p-4 ${
               msg.role === 'user'
-                ? 'bg-hermes-gold/20 border border-hermes-gold/30 text-hermes-text'
+                ? 'bg-hermes-gold/15 border border-hermes-gold/25 text-hermes-text'
                 : 'bg-hermes-surface border border-hermes-border text-hermes-text'
             }`}>
               {msg.role === 'assistant' && (
-                <p className="text-hermes-gold font-ui text-xs mb-2 tracking-wide">HERMES</p>
+                <p className="text-hermes-gold font-ui text-[10px] mb-2 tracking-wider font-bold">HERMES</p>
               )}
               <div className="text-sm whitespace-pre-wrap leading-relaxed">{msg.content}</div>
             </div>
@@ -169,9 +180,9 @@ Respond with clinical depth appropriate for a fellow practitioner, but explain c
 
         {loading && (
           <div className="flex justify-start">
-            <div className="bg-hermes-surface border border-hermes-border rounded-lg p-4">
-              <p className="text-hermes-gold font-ui text-xs mb-2 tracking-wide">HERMES</p>
-              <div className="flex gap-1">
+            <div className="bg-hermes-surface border border-hermes-border rounded-2xl p-4">
+              <p className="text-hermes-gold font-ui text-[10px] mb-2 tracking-wider font-bold">HERMES</p>
+              <div className="flex gap-1.5">
                 <span className="w-2 h-2 bg-hermes-gold rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
                 <span className="w-2 h-2 bg-hermes-gold rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
                 <span className="w-2 h-2 bg-hermes-gold rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
@@ -183,21 +194,21 @@ Respond with clinical depth appropriate for a fellow practitioner, but explain c
       </div>
 
       {/* Input */}
-      <div className="flex gap-3">
+      <div className="flex gap-2">
         <input
           value={input}
           onChange={e => setInput(e.target.value)}
           onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(input) } }}
-          placeholder="Ask HERMES anything about your health data..."
+          placeholder="Ask HERMES anything..."
           disabled={loading}
-          className="flex-1 bg-hermes-surface border border-hermes-border rounded-lg px-4 py-3 font-ui text-sm text-hermes-text placeholder-hermes-muted focus:border-hermes-gold focus:outline-none disabled:opacity-50"
+          className="flex-1 bg-hermes-surface border border-hermes-border rounded-xl px-4 py-3 font-ui text-sm text-hermes-text placeholder-hermes-muted focus:border-hermes-gold focus:outline-none disabled:opacity-50"
         />
         <button
           onClick={() => sendMessage(input)}
           disabled={loading || !input.trim()}
-          className="px-6 py-3 bg-hermes-gold text-hermes-bg rounded-lg font-ui text-sm font-bold hover:bg-yellow-500 transition-colors disabled:opacity-50"
+          className="p-3 gradient-gold rounded-xl hover:opacity-90 transition-opacity disabled:opacity-50"
         >
-          Send
+          <Send size={18} className="text-hermes-bg" />
         </button>
       </div>
     </div>
