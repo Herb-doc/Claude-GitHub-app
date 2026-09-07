@@ -8,6 +8,10 @@ import Analyze from './components/Analyze'
 import Letters from './components/Letters'
 import Protocols from './components/Protocols'
 import Consult from './components/Consult'
+import Patients from './components/Patients'
+import Workspace from './components/Workspace'
+import Guardian from './components/Guardian'
+import Website from './components/Website'
 import hermesData from './data/hermes_data.json'
 
 export default function App() {
@@ -24,6 +28,10 @@ export default function App() {
       case 'Protocols': return <Protocols data={data} setData={setData} />
       case 'Consult': return <Consult data={data} />
       case 'Briefing': return <Briefing data={data} />
+      case 'Patients': return <Patients />
+      case 'Workspace': return <Workspace />
+      case 'Guardian': return <Guardian data={data} />
+      case 'Website': return <Website data={data} />
       default: return <Dashboard data={data} onNavigate={setActiveTab} />
     }
   }

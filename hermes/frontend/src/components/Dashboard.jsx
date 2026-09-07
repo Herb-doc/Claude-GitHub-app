@@ -8,6 +8,8 @@ import {
   MessageCircle,
   FlaskConical,
   Mail,
+  Users,
+  Inbox,
   ChevronRight,
 } from 'lucide-react'
 
@@ -87,6 +89,14 @@ export default function Dashboard({ data, onNavigate }) {
       {/* Quick Actions */}
       <div className="grid grid-cols-2 gap-3">
         <QuickAction
+          label="Find a Patient"
+          desc="Search your Drive"
+          icon={Users}
+          color="#4A8FD4"
+          bgClass="bg-hermes-blue/10 border-hermes-blue/20"
+          onClick={() => onNavigate('Patients')}
+        />
+        <QuickAction
           label="Consult HERMES"
           desc="Chat with your AI advisor"
           icon={MessageCircle}
@@ -117,6 +127,14 @@ export default function Dashboard({ data, onNavigate }) {
           color="#E06B9F"
           bgClass="bg-hermes-pink/10 border-hermes-pink/20"
           onClick={() => onNavigate('Letters')}
+        />
+        <QuickAction
+          label="Workspace"
+          desc="Mail, Drive, Calendar"
+          icon={Inbox}
+          color="#52C47A"
+          bgClass="bg-green-500/10 border-green-500/20"
+          onClick={() => onNavigate('Workspace')}
         />
       </div>
 
