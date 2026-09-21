@@ -22,6 +22,19 @@ server except Anthropic's API, and only when you use an AI feature.
 
 ---
 
+## A note on the name
+
+This HERMES is a name collision with **Hermes Agent** by Nous Research, an
+unrelated open-source AI agent that is actively released and covered on
+YouTube. They share nothing but the word.
+
+This one is built for this practice and lives only in this repository. It has
+no public releases and no version to upgrade to — it is whatever was last
+committed here. The `1.0.0` in `package.json` is npm's default placeholder,
+not a release number.
+
+---
+
 ## The tabs
 
 | Tab | What it does |
