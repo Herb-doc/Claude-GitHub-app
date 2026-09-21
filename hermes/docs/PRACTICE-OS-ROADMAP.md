@@ -33,9 +33,40 @@ So the hour splits cleanly:
 
 ---
 
+### These three are not versions of each other
+
+Worth being blunt about, because the names invite the wrong idea: **none of
+these replaces another, and HERMES is not being upgraded into anything.**
+
+| | What it is | Put another way |
+|---|---|---|
+| **HERMES** | The practice's own system — labs, protocols, records, Guardian | The treatment room and the file cabinet |
+| **Antigravity** | A workbench for building software | The tool bench in the back |
+| **AI Studio** | A website that hands you an API key | The supplier |
+
+Antigravity holds no patient records and never will. It is where someone
+*works on* HERMES — not something that does HERMES's job. HERMES stays, and
+everything in this roadmap is built on top of it.
+
+### One of these is optional
+
+**You do not need Antigravity to use AI Studio.** They are independent. The
+API key takes five minutes on a website whether or not Antigravity is ever
+installed.
+
+The key is the part that matters: it is what makes Gemini callable *by
+HERMES*, which is what lets Gems and Claude tools start working the same data.
+
+Antigravity is a developer's IDE, and Claude Code already does that job here.
+Its one real draw is running Gemini and Claude side by side in one workspace.
+Worth a look eventually — but **nothing in Phases 1–6 is blocked without it.**
+If the hour is short, do step 2 and skip step 1.
+
+---
+
 ## The hour: Phase 0
 
-### 1 — Install Antigravity (10 min)
+### 1 — Install Antigravity (10 min, optional)
 
 1. Go to <https://antigravity.google/download/>
 2. Take the **Windows desktop installer**. Ignore the CLI, SDK, and editor
