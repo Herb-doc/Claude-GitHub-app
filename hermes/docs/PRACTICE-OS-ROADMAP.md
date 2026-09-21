@@ -294,6 +294,26 @@ This is the one that compounds. A plant-chemistry question you would have
 spent an evening on becomes a twenty-minute answer with citations you can
 defend.
 
+### Phase 5b — Voice for the practitioner *(after Phase 5)*
+
+Deep tissue work occupies both hands for most of a working day. Washing up to
+reach a keyboard is the reason a question goes unasked, so the practitioner's
+own voice interface to HERMES earns its place here in a way it would not in a
+desk-bound practice.
+
+- Push-to-talk, never always-listening. A microphone that is open by default
+  in a room where clients discuss their health is a consent problem before it
+  is a technical one.
+- Read-only to start: pull up a trend, a protocol, a past finding, an
+  interaction check. Speaking a change into a patient record is a different
+  risk and waits.
+- Runs against HERMES through the same MCP tools as everything else, so it
+  inherits the existing boundaries rather than inventing its own.
+
+Worth separating from the Phase 3 front desk, which is voice pointed at
+*patients*. This one is pointed at the practitioner, mid-session, and is the
+narrower and safer of the two.
+
 ### Phase 6 — Follow-through and books *(ongoing)*
 
 - Post-visit follow-up on your schedule, drafted for your approval.
