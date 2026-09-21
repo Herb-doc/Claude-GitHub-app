@@ -168,4 +168,15 @@ charts.
 
 ---
 
+## Where HERMES is going
+
+HERMES is the foundation for a wider system that runs the practice — front
+desk, intake, clinical research, follow-up and books, with Google and
+Anthropic agents sharing the same tools and the same protocols.
+
+The plan, the compliance gate, and the first hour of setup:
+**[docs/PRACTICE-OS-ROADMAP.md](docs/PRACTICE-OS-ROADMAP.md)**
+
+---
+
 *Built for Daniel M. Phend, ND, MH — Future Body Sciences, La Porte, Indiana*
