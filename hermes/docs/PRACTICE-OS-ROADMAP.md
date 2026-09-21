@@ -215,6 +215,31 @@ designed around it.
 
 ---
 
+## Tools evaluated
+
+A running record, so a tool already looked at does not get re-litigated. The
+question that decides clinical use is always the same: **will the vendor sign
+a BAA?** Everything else is secondary.
+
+| Tool | What it is | Verdict |
+|---|---|---|
+| **Hermes Agent** (Nous Research) | Open-source autonomous agent, real project, actively released | **Non-clinical only.** Good candidate for the products company and public content |
+| **Hermes Apollo / "Agent OS"** (Julian Goldie) | Voice agent sold as a zip file through a paid community | **No.** Built for marketing businesses, unverifiable provenance, always-listening by default |
+| **Cloudways** | Managed hosting, the usual way Hermes Agent is run | **Will not sign a BAA.** No patient data, ever |
+| **DigitalOcean** | Cloudways' parent company | **Signs a BAA**, for designated covered products with Standard or Premium support |
+| **Google AI Studio** | Gemini API keys and prototyping | **Not BAA-covered.** Prototyping with non-patient data only |
+| **Vertex AI** | Same Gemini models via Google Cloud | **BAA available.** The production route for anything patient-facing |
+
+Note the Cloudways/DigitalOcean split. A parent company signing a BAA says
+nothing about its subsidiary, and the names invite exactly that assumption.
+Check the vendor actually being paid.
+
+Three unrelated products share the Hermes name: this system, the Nous Research
+agent, and the Goldie voice product. A video about "the new Hermes update" is
+almost never about this one.
+
+---
+
 ## Phases
 
 ### Phase 1 — The spine *(week 1)*
