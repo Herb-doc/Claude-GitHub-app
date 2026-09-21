@@ -1,6 +1,6 @@
 # The Practice OS — Roadmap
 
-**Turning HERMES into the operating system that runs Future Body Sciences.**
+**Turning HERMES into the operating system that runs About Your Body LLC.**
 
 Goal: one system where Google agents and Anthropic agents work the same
 tools, read the same protocols, and cover the practice end to end — front
@@ -30,6 +30,24 @@ So the hour splits cleanly:
 |---|---|
 | Install Antigravity on your PC | Speaks to HERMES through the shared tool layer |
 | Get an AI Studio API key | Becomes HERMES's second model provider |
+
+---
+
+### Which business this is for
+
+HERMES serves **About Your Body LLC** — the naturopathic clinic, client work,
+aboutyourbody.net. Everything in this roadmap is that clinic's system.
+
+**Future Body Sciences** is a separate company: herbal formulas and
+nutritional products sold to other health professionals. It is deliberately
+**out of scope here** and gets stood up after the clinic is finished. When it
+comes, it is a different build with a different shape — wholesale and B2B,
+not patient care — and it does not touch PHI, so it is not gated by the
+compliance work below.
+
+Keeping them apart matters in the code too: anything HERMES generates for a
+client, a letter especially, must carry the clinic's name, not the products
+company's.
 
 ---
 
@@ -83,7 +101,7 @@ It is free in public preview for individuals. No card needed.
 
 1. Go to <https://aistudio.google.com>, same Google account.
 2. **Get API key** → **Create API key**.
-3. Create it inside a **new Google Cloud project** named `future-body-sciences`
+3. Create it inside a **new Google Cloud project** named `about-your-body`
    rather than the default scratch project. You will need that project to exist
    later for the compliance work, and making it now saves a migration.
 4. Copy the key.
@@ -314,5 +332,5 @@ These shape Phases 3 and 4, and I need your answers before building them:
 3. **Roughly how many calls a day**, and what share are scheduling versus
    clinical questions? Determines whether Phase 3 step 1 is worth shipping on
    its own.
-4. **Do you have a business entity and EIN for Future Body Sciences?** Google
+4. **Is About Your Body LLC's EIN in hand?** Google
    and Anthropic both want one on a BAA.

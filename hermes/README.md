@@ -179,4 +179,4 @@ The plan, the compliance gate, and the first hour of setup:
 
 ---
 
-*Built for Daniel M. Phend, ND, MH — Future Body Sciences, La Porte, Indiana*
+*Built for Daniel M. Phend, ND, MH — About Your Body LLC, La Porte, Indiana*
