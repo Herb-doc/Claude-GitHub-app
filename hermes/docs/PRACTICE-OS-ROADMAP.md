@@ -215,6 +215,30 @@ designed around it.
 
 ---
 
+### If Antigravity does get installed
+
+Antigravity 2.0 runs standalone, without an IDE, and ships a CLI called `agy`
+with its own scheduled tasks. Hermes Agent carries an `antigravity-cli` skill
+in its optional catalog, off until switched on, that drives `agy` and reads
+its logs back. So the two connect without anything being bought.
+
+None of that is needed here. The clinic's agents reach HERMES through MCP,
+which both Claude and Gemini already speak, and that is the layer worth
+building. Antigravity stays what it was: a place to work on the code.
+
+Worth knowing because bundles of these free parts are sold pre-wired. The
+components — the skill, the CLI, Antigravity itself, an Obsidian vault, the
+schedulers — all cost nothing and ship with the tools. What such a bundle
+sells is the wiring and the support around it, not capability that is
+otherwise out of reach.
+
+A shared notes vault is also not the same thing as a shared tool layer. Notes
+give an agent something to read about a protocol. Tools let it run the
+interaction check against a real medication list. The second is what clinical
+work needs, and it is what MCP provides.
+
+---
+
 ## Tools evaluated
 
 A running record, so a tool already looked at does not get re-litigated. The
