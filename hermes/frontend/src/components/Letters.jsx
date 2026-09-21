@@ -43,7 +43,7 @@ export default function Letters({ data }) {
         body: JSON.stringify({
           model: 'claude-sonnet-4-20250514',
           max_tokens: 4096,
-          system: `You are HERMES, generating a physician letter for Daniel M. Phend, ND, MH (Naturopathic Doctor, Master Herbalist, 40+ years clinical experience, About Your Body LLC, La Porte, Indiana).
+          system: `You are HERMES, generating a physician letter for Daniel M. Phend, ND, MH (Naturopathic Doctor, Master Herbalist, 40+ years clinical experience, ${data.metadata?.practice || 'About Your Body LLC'}, ${data.metadata?.address || '901 East Reynolds Street, Goshen, IN 46526'}).
 
 Write a professional, collaborative physician letter addressed to ${doctor}. The letter should:
 1. Include specific documented lab values with dates

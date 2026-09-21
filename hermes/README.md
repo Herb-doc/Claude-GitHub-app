@@ -179,4 +179,5 @@ The plan, the compliance gate, and the first hour of setup:
 
 ---
 
-*Built for Daniel M. Phend, ND, MH — About Your Body LLC, La Porte, Indiana*
+*Built for Daniel M. Phend, ND, MH — About Your Body LLC*
+*901 East Reynolds Street, Goshen, IN 46526*
