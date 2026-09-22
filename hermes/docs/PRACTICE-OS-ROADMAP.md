@@ -188,15 +188,26 @@ handling **PHI**. That is not a formality — it changes which products you are
 allowed to use, and it has real lead time, so it starts now, in parallel with
 Phase 1, not after it.
 
-Two specifics that will bite if missed:
+**The gate before the gate: are you a covered entity?** Accepting Google's
+Workspace BAA requires affirming, in a contract, that About Your Body LLC is a
+HIPAA covered entity. If it is not one, that affirmation is false. A practice
+that does not bill insurance electronically may genuinely fall outside the
+definition. This is a determination for an attorney licensed in Indiana, it is
+not something to reason out here, and **every phase below that touches patient
+data waits on it.** Work that touches no patient data does not.
 
-- **The AI Studio key you just made is not HIPAA-covered.** Google AI Studio is
-  a developer playground and is excluded from Google's BAA. It is fine for
-  prototyping with fake data. The moment a real patient name goes through it,
-  you are out of compliance. Production patient traffic runs through **Vertex
-  AI** on a Google Cloud project with a **signed BAA** — same Gemini models,
-  different door. (Verify the exact product names on Google's covered-services
-  list when you sign; the naming there is inconsistent.)
+Three more specifics that will bite if missed:
+
+- **The AI Studio key is not HIPAA-covered.** Google AI Studio is a developer
+  playground and is excluded from Google's BAA, as are Gems, NotebookLM,
+  Workspace Studio and consumer Gemini. Fine for prototyping with fake data;
+  out of compliance the moment a real patient name goes through.
+- **Vertex AI is not the answer, despite the obvious guess.** Vertex AI is
+  absent from Google's covered-products list. The covered service for
+  unattended processing is **Gemini Enterprise Agent Platform**. Google's own
+  pages are inconsistent here, so verify the exact product name against the
+  covered list before building on it — and note that Google's rule is that new
+  services default to *not* covered.
 - **Consumer Claude and consumer Gemini are also not covered.** Patient-facing
   work runs through the APIs under a commercial agreement with a BAA, not
   through the chat apps. Your own internal use of the chat apps — thinking
@@ -252,7 +263,10 @@ a BAA?** Everything else is secondary.
 | **Cloudways** | Managed hosting, the usual way Hermes Agent is run | **Will not sign a BAA.** No patient data, ever |
 | **DigitalOcean** | Cloudways' parent company | **Signs a BAA**, for designated covered products with Standard or Premium support |
 | **Google AI Studio** | Gemini API keys and prototyping | **Not BAA-covered.** Prototyping with non-patient data only |
-| **Vertex AI** | Same Gemini models via Google Cloud | **BAA available.** The production route for anything patient-facing |
+| **Vertex AI** | Gemini models via Google Cloud | **Absent from Google's covered list.** Not the patient-facing route, despite being the obvious guess |
+| **Gemini Enterprise Agent Platform** | Google Cloud's covered agent service | **The covered route** for unattended patient-data processing. Verify the name at signing |
+| **Google Voice** | Telephony inside Workspace | **Covered.** Check it before adding a telephony vendor |
+| **Workspace Studio / NotebookLM / Gems** | Google's no-code agent builder and notebooks | **Not covered.** The agent builder is the tool most wanted and least usable for patients |
 
 Note the Cloudways/DigitalOcean split. A parent company signing a BAA says
 nothing about its subsidiary, and the names invite exactly that assumption.
@@ -281,8 +295,9 @@ Make HERMES callable by agents.
 **Done when:** you ask a question in Antigravity and in Claude, and both pull
 the same lab value out of HERMES.
 
-**In parallel:** start the BAA paperwork — Google Cloud and Anthropic. It is
-the long pole and it blocks Phase 3.
+**In parallel:** get the covered-entity determination moving with an Indiana
+attorney. That, not the paperwork, is the long pole, and it blocks Phase 3.
+The BAAs themselves take minutes once the determination is in.
 
 ### Phase 2 — Protocols as code *(week 2)*
 
@@ -301,9 +316,11 @@ software and starts being *your* practice.
 
 ### Phase 3 — The front desk *(weeks 3–4 — gated on BAAs)*
 
-The virtual secretary. Voice, on a BAA-covered telephony vendor (Twilio has
-signed BAAs for years and is the safe default), with the model behind it on
-Vertex or the Anthropic API.
+The virtual secretary. **Google Voice is a covered Workspace service**, so
+check whether it carries the call before adding a telephony vendor — staying
+inside Workspace removes a vendor, a contract and a second BAA. Twilio is the
+fallback if Voice cannot do what the front desk needs. The model behind it runs
+on a covered service or the Anthropic API under a signed agreement.
 
 Ship it in this order, because the risk climbs with each step:
 

@@ -49,13 +49,33 @@ The plan for what it becomes: `hermes/docs/PRACTICE-OS-ROADMAP.md`.
 
 This repository belongs to a healthcare practice, and patient records are PHI.
 
-- **Never paste real patient data into a service without a signed BAA.** Google
-  AI Studio and the consumer Claude and Gemini apps are not covered. Vertex AI
-  and the Anthropic API under a commercial agreement can be.
+The line that decides everything is not Google versus Anthropic. It is
+**identifiable patient information versus everything else.**
+
+Inside the line — covered services only:
+patient intake, clinical notes naming a patient, blood panels tied to a person,
+physician letters, protocols written for a named patient, scheduling that
+identifies who.
+
+Outside it — use whatever tool is best:
+botanical mechanism research, monographs, patient-education templates written
+for no one in particular, business operations, work on this system itself, and
+de-identified case discussion. **Daniel's own health records are outside the
+line — he is not his own patient.**
+
+- **Never paste identifiable patient data into a service without a signed BAA.**
+  Google AI Studio, Gems, NotebookLM, Workspace Studio and the consumer Claude
+  and Gemini apps are not covered. Note that **Vertex AI is absent from
+  Google's covered list**; the covered service is Gemini Enterprise Agent
+  Platform. Verify names against Google's list rather than assuming.
 - **Never commit** `credentials.json`, `token.json`, API keys, or any file
   containing patient information. `.gitignore` covers the known ones; that is
   not a substitute for checking.
-- `hermes_data.json` holds real clinical findings. Treat it as a chart.
+- `hermes_data.json` holds Daniel's **own** findings, so it sits outside the
+  line. The **Patients tab is different** — it pulls other people's records
+  from Drive, and that is PHI.
+- Whether About Your Body LLC is a HIPAA covered entity is an open legal
+  question for an Indiana attorney. Do not assume either answer.
 - When a task does not need patient data, do not load it.
 
 ## Clinical boundaries
