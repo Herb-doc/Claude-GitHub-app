@@ -145,7 +145,7 @@ export default function Website({ data }) {
         body: JSON.stringify({
           model: 'claude-sonnet-4-20250514',
           max_tokens: 4096,
-          system: `You are HERMES, drafting public-facing website and practice content for Daniel M. Phend, ND, MH — a Naturopathic Doctor and Master Herbalist with 40+ years of clinical experience, specializing in immune and autoimmune disorders. His practice is Future Body Sciences in La Porte, Indiana, online at aboutyourbody.net.
+          system: `You are HERMES, drafting public-facing website and practice content for Daniel M. Phend, ND, MH — a Naturopathic Doctor and Master Herbalist with 40+ years of clinical experience, specializing in immune and autoimmune disorders. His practice is ${metadata.practice || 'About Your Body LLC'} in ${metadata.location || 'Goshen, Indiana'}, online at aboutyourbody.net.
 
 VOICE AND STANDARDS
 - Write in his voice: naturopathic and botanical medicine grounded in evidence, spoken by an experienced clinician who respects the reader's intelligence.
@@ -168,7 +168,7 @@ Active clinical focus areas in this practice:
 ${protocolContext || 'Immune and autoimmune support through botanical medicine.'}`,
           messages: [{
             role: 'user',
-            content: `Draft a ${contentType} for ${metadata.practice || 'Future Body Sciences'}.
+            content: `Draft a ${contentType} for ${metadata.practice || 'About Your Body LLC'}.
 
 TOPIC: ${topic}${keyPoints.trim() ? `\n\nKEY POINTS TO COVER:\n${keyPoints}` : ''}`
           }]
@@ -363,10 +363,10 @@ TOPIC: ${topic}${keyPoints.trim() ? `\n\nKEY POINTS TO COVER:\n${keyPoints}` : '
             <div className="min-w-0">
               <p className="font-ui text-[10px] text-hermes-muted tracking-wider">PRACTICE</p>
               <p className="text-hermes-text text-sm font-medium truncate">
-                {metadata.practice || 'Future Body Sciences'}
+                {metadata.practice || 'About Your Body LLC'}
               </p>
               <p className="text-hermes-muted text-xs truncate">
-                {metadata.location || 'La Porte, Indiana'} &middot; aboutyourbody.net
+                {metadata.location || 'Goshen, Indiana'} &middot; aboutyourbody.net
               </p>
             </div>
           </div>
