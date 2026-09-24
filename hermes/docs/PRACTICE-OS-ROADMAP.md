@@ -226,6 +226,69 @@ designed around it.
 
 ---
 
+### The route that does not wait for the attorney
+
+Your own 8 September architecture listed three ways past this, and the first
+one is the one that got dropped: **de-identify upstream.** It is worth putting
+back, because it is the only route that needs no determination, no BAA and no
+vendor's permission.
+
+If a patient document enters the pipeline already reduced to a **case code** —
+`AYB-0147` rather than a name, a date of birth reduced to a year, an address
+dropped entirely — then what the agents handle is not PHI, and both vendors'
+uncovered services are back on the table. The key that maps code to person
+lives in one place you control, that no agent can reach.
+
+What that unlocks immediately, with no legal gate:
+
+- The **scheduling and reminder half** of the follow-up coordinator: who is due
+  for a three-month reassessment, whose intake never came back, which protocol
+  reviews are overdue. That is dates against case codes. It is not PHI, and it
+  is most of the value.
+- Protocol and interaction work, which never needed a name to begin with.
+- The research desk, which is pointed at the literature, not at people.
+
+What it does not unlock: anything where the patient's own words, labs or
+narrative have to stay attached to reach a useful answer, and anything
+patient-*facing*, since the person on the phone is identified by definition.
+Those still wait on the determination.
+
+The practical order, then: pursue the attorney question because it has the
+longest lead time, and build the de-identified half now rather than idling
+behind it.
+
+### A PHI path that already exists in the code
+
+The blocker described above is not hypothetical here. The **Patients tab**
+(`hermes/frontend/src/components/Patients.jsx`) has a Summarize button that
+posts a patient document's filename and full text from the browser straight to
+`api.anthropic.com`, using a key typed into a JavaScript prompt, with
+`anthropic-dangerous-direct-browser-access` set. Since the folder search is by
+patient name, the filename usually carries one.
+
+That is exactly the L3 pipeline your 8 September page marked blocked — except
+it is shipped and clickable rather than waiting on a decision. Three things
+are true about it at once, and all three matter:
+
+1. It works, and it is genuinely useful before a consult.
+2. It sends identifiable patient information to an API on a key with no BAA
+   behind it.
+3. Nothing in the interface says so.
+
+The fix is not to delete the feature. It is to route it through the backend
+that already exists on `127.0.0.1` — which can hold the key server-side, strip
+identifiers to a case code before the call, and log what went out. That is a
+Phase 1 item, not a Phase 3 one, because the button exists today.
+
+**Also worth a look while in there:** every model call in this repo is pinned
+to `claude-sonnet-4-20250514`, in seven source files and the built bundle.
+That pin is two model generations back. Nothing is broken by it, but a
+re-point belongs in the same pass, and it should come from config rather than
+being typed into seven components — the same lesson as the practice name and
+the address.
+
+---
+
 ### If Antigravity does get installed
 
 Antigravity 2.0 runs standalone, without an IDE, and ships a CLI called `agy`
@@ -291,6 +354,26 @@ Make HERMES callable by agents.
 - Teach Guardian to check `GOOGLE_API_KEY` and the MCP server's health, so a
   broken spine shows up in the tab you already trust.
 - Register the server in both Claude Code and Antigravity.
+- Move the Patients-tab Summarize call off the browser and behind the local
+  backend, so the key stops being typed into a prompt and identifiers can be
+  stripped before anything leaves the machine. See *A PHI path that already
+  exists in the code* above.
+- Lift the model pin out of the seven components into config, and re-point it.
+
+**The Drive layout is already decided**, and the MCP server should map onto it
+rather than invent a second scheme. The numbered folders in your 8 September
+structure are the filing system the agents inherit:
+
+| | Folder | What the agents use it for |
+| --- | --- | --- |
+| 00 | Shared Memory | The cross-tool context both vendors read |
+| 01 | Patient Intake System | Intake forms and their responses |
+| 03 | Business Ops | The books, the front desk's non-clinical side |
+| 05 | Clinical Templates | What document generation starts from |
+| 06 | Research Library | Where the Phase 5 research desk files its finds |
+| 07 | Prompt Library | Prompts as data, not as strings in components |
+| 08 | Architecture & Build | This roadmap's home once it leaves the repo |
+| PT | Patient Records | **PHI. Nothing reaches it until the gate clears.** |
 
 **Done when:** you ask a question in Antigravity and in Claude, and both pull
 the same lab value out of HERMES.
@@ -382,6 +465,20 @@ narrower and safer of the two.
 
 ### Phase 6 — Follow-through and books *(ongoing)*
 
+This phase is already designed. Your 17 September **Follow-Up Coordinator
+Agent Workflow** specifies it down to the review gate, and it should be built
+from that rather than re-drawn: six jobs (intake generation, follow-up
+tracking, document generation, progress tracking, reminders, a weekly
+dashboard), reading from and writing back to Drive, with **every outbound
+document stopping at your approval before a client sees it**. Its timeline —
+week 1 intake, week 3 check-in, month 3 reassessment, month 6 annual review —
+is the schedule the reminders run on.
+
+It splits cleanly along the line in *The route that does not wait for the
+attorney*: the tracking, reminder and dashboard half runs on dates and case
+codes and can be built now; the document-generation half handles patient
+narrative and waits. Build the half that runs.
+
 - Post-visit follow-up on your schedule, drafted for your approval.
 - Protocol adherence check-ins.
 - QuickBooks is already connected — invoicing, aging, and the monthly picture
@@ -420,3 +517,9 @@ These shape Phases 3 and 4, and I need your answers before building them:
    its own.
 4. **Is About Your Body LLC's EIN in hand?** Google
    and Anthropic both want one on a BAA.
+5. **Which repository is the real HERMES?** Your 8 September structure points
+   at `Herb-doc/HERMES`, commit `890af07`, branch `claude/hermes-initial-build`,
+   and records model pins (`claude-opus-4-8`, `claude-opus-4-7`) that appear
+   nowhere in *this* repository, which pins Sonnet 4 throughout. Either there
+   are two codebases or one was renamed. Worth settling before the MCP server
+   is written against the wrong one.
