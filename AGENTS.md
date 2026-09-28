@@ -47,36 +47,40 @@ The plan for what it becomes: `hermes/docs/PRACTICE-OS-ROADMAP.md`.
 
 ## Handling patient data
 
-This repository belongs to a healthcare practice, and patient records are PHI.
+This repository belongs to a healthcare practice. **As of 28 September 2026,
+Daniel has made the call: HIPAA compliance is not a target for this build.**
+No BAA-chasing, no covered-entity determination gating the work. That was the
+previous stance and it is superseded — don't resurrect it.
 
-The line that decides everything is not Google versus Anthropic. It is
-**identifiable patient information versus everything else.**
+What replaces it is not "anything goes." The standard is **strong security on
+patient data regardless of compliance framework**, because it is still other
+people's medical information and still worth protecting on its own merits:
 
-Inside the line — covered services only:
-patient intake, clinical notes naming a patient, blood panels tied to a person,
-physician letters, protocols written for a named patient, scheduling that
-identifies who.
-
-Outside it — use whatever tool is best:
-botanical mechanism research, monographs, patient-education templates written
-for no one in particular, business operations, work on this system itself, and
-de-identified case discussion. **Daniel's own health records are outside the
-line — he is not his own patient.**
-
-- **Never paste identifiable patient data into a service without a signed BAA.**
-  Google AI Studio, Gems, NotebookLM, Workspace Studio and the consumer Claude
-  and Gemini apps are not covered. Note that **Vertex AI is absent from
-  Google's covered list**; the covered service is Gemini Enterprise Agent
-  Platform. Verify names against Google's list rather than assuming.
-- **Never commit** `credentials.json`, `token.json`, API keys, or any file
-  containing patient information. `.gitignore` covers the known ones; that is
-  not a substitute for checking.
-- `hermes_data.json` holds Daniel's **own** findings, so it sits outside the
-  line. The **Patients tab is different** — it pulls other people's records
-  from Drive, and that is PHI.
-- Whether About Your Body LLC is a HIPAA covered entity is an open legal
-  question for an Indiana attorney. Do not assume either answer.
+- **No plaintext patient data leaves the machine to an uncontrolled
+  destination.** A local backend holding API keys server-side is fine. A
+  browser prompt asking for a key, then POSTing a patient's file and name
+  straight to a third-party API, is not — that pattern is being removed
+  wherever it appears (see the Patients tab fix, Phase 1 of the roadmap).
+- **No secrets in the browser, in prompts, or in git.** Never commit
+  `credentials.json`, `token.json`, API keys, or any file containing patient
+  information. `.gitignore` covers the known ones; that is not a substitute
+  for checking `git status` before a commit.
+- **Prefer de-identification where it costs nothing.** A case code instead of
+  a name, a year instead of a date of birth, costs nothing when the task
+  doesn't need the identity, and it's cheap insurance later if the compliance
+  question ever gets reopened.
+- **Local-first.** HERMES already runs on the practitioner's own machine with
+  a backend bound to 127.0.0.1. Keep that shape — it's the actual security
+  control, not a formality.
+- `hermes_data.json` holds Daniel's **own** findings. The **Patients tab is
+  different** — it pulls other people's records from Drive, and that data
+  gets the same care above even though it isn't gated on a BAA anymore.
 - When a task does not need patient data, do not load it.
+
+If the compliance question ever comes back (insurance billing changes, a
+partner practice, an attorney's answer), the code should not have to be
+rebuilt from scratch to satisfy it — that's the practical reason "strong
+security" and "no compliance target" aren't the same as "no discipline."
 
 ## Clinical boundaries
 

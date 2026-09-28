@@ -19,10 +19,15 @@ export class ApiError extends Error {
 const OFFLINE_MESSAGE =
   'Cannot reach the HERMES backend. Open a Command Prompt, go to the hermes\\server folder, and run: python server.py'
 
-async function request(path, { signal } = {}) {
+async function request(path, { signal, method = 'GET', body } = {}) {
   let response
   try {
-    response = await fetch(`${BASE}${path}`, { signal })
+    response = await fetch(`${BASE}${path}`, {
+      signal,
+      method,
+      headers: body ? { 'Content-Type': 'application/json' } : undefined,
+      body: body ? JSON.stringify(body) : undefined,
+    })
   } catch (err) {
     if (err.name === 'AbortError') throw err
     throw new ApiError(OFFLINE_MESSAGE, { offline: true })
@@ -64,6 +69,9 @@ export const api = {
 
   fileText: (fileId, opts) =>
     request(`/api/files/${encodeURIComponent(fileId)}/text`, opts),
+
+  summarizeDocument: (fileId, opts) =>
+    request('/api/summarize', { ...opts, method: 'POST', body: { file_id: fileId } }),
 
   driveRecent: (limit = 25, opts) =>
     request(`/api/drive/recent${qs({ limit })}`, opts),

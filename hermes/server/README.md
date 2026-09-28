@@ -15,7 +15,7 @@ which means only programs on your own machine can reach it.
 
 | Dashboard tab | What the server does |
 |---------------|----------------------|
-| **Patients** | Searches Drive by patient name, opens folders, reads documents |
+| **Patients** | Searches Drive by patient name, opens folders, reads documents, and — if `ANTHROPIC_API_KEY` is set — summarizes a document without ever putting the key in your browser |
 | **Workspace** | Shows your Gmail, Drive files, Google Docs, and Calendar |
 | **Guardian** | Reports whether everything is connected |
 
@@ -63,6 +63,19 @@ You need a file called `credentials.json`. Here's how to make one:
 11. Click **Download JSON**
 12. Rename the downloaded file to exactly `credentials.json`
 13. Move it into the `hermes\agent\` folder
+
+### Step 2b: Set your Anthropic key (optional — only for document summaries)
+
+The Patients tab's Summarize button needs this. Skip it if you don't use that
+button; everything else works without it.
+
+```
+setx ANTHROPIC_API_KEY sk-ant-your-key-here
+```
+
+Close and reopen Command Prompt after running that, so the new variable
+takes effect. **Never** put this key in the dashboard itself — the server is
+the only place it should live.
 
 ### Step 3: Sign in to Google
 
@@ -134,12 +147,18 @@ isn't running. Start it with `python server.py`.
 
 ## Security notes
 
-- `credentials.json` and `token.json` are your keys to your Google account.
-  Never share them, never email them, never commit them. The `.gitignore`
-  already excludes them.
+- `credentials.json`, `token.json`, and your `ANTHROPIC_API_KEY` are your
+  keys to your accounts. Never share them, never email them, never commit
+  them. The `.gitignore` already excludes the files; the API key belongs in
+  an environment variable, not in a file at all.
 - The server binds to `127.0.0.1` only, so nothing on your network can reach
   it — only your own computer.
 - All Google permissions are **read-only** except `drive.file`, which lets
   the agent save the health chart it generates back to your Drive.
-- Patient records are protected health information. Treat this machine, and
-  these files, the way you'd treat a filing cabinet of paper charts.
+- The Summarize button in the Patients tab sends a document's text to
+  Anthropic's API through this server — never straight from the browser, and
+  never on a key typed into a prompt. If you'd rather nothing about a patient
+  leave this machine, don't set `ANTHROPIC_API_KEY` and skip that button.
+- These are still other people's health records. Treat this machine, and
+  these files, the way you'd treat a filing cabinet of paper charts, whether
+  or not any particular compliance rule applies to this practice.

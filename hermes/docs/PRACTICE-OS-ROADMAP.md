@@ -42,8 +42,7 @@ aboutyourbody.net. Everything in this roadmap is that clinic's system.
 nutritional products sold to other health professionals. It is deliberately
 **out of scope here** and gets stood up after the clinic is finished. When it
 comes, it is a different build with a different shape — wholesale and B2B,
-not patient care — and it does not touch PHI, so it is not gated by the
-compliance work below.
+not patient care — and it never touches patient data at all.
 
 Keeping them apart matters in the code too: anything HERMES generates for a
 client, a letter especially, must carry the clinic's name, not the products
@@ -102,8 +101,9 @@ It is free in public preview for individuals. No card needed.
 1. Go to <https://aistudio.google.com>, same Google account.
 2. **Get API key** → **Create API key**.
 3. Create it inside a **new Google Cloud project** named `about-your-body`
-   rather than the default scratch project. You will need that project to exist
-   later for the compliance work, and making it now saves a migration.
+   rather than the default scratch project. Keeping practice-related API
+   activity in its own project is just tidier — you'll want that separation
+   once billing and usage across projects starts to matter.
 4. Copy the key.
 
 ### 3 — Store the key the way HERMES expects (5 min)
@@ -181,85 +181,73 @@ Three things make that work, and they are the whole build:
 
 ---
 
-## The gate that governs everything downstream
+## Security, without a compliance gate
 
-An AI secretary answering your phone and fielding patient questions is
-handling **PHI**. That is not a formality — it changes which products you are
-allowed to use, and it has real lead time, so it starts now, in parallel with
-Phase 1, not after it.
+**28 September 2026 — Daniel's call: no HIPAA compliance target for now.** No
+covered-entity determination, no chasing BAAs before a phase can start. That
+was the prior framing on this page and it's gone; don't rebuild it.
 
-**The gate before the gate: are you a covered entity?** Accepting Google's
-Workspace BAA requires affirming, in a contract, that About Your Body LLC is a
-HIPAA covered entity. If it is not one, that affirmation is false. A practice
-that does not bill insurance electronically may genuinely fall outside the
-definition. This is a determination for an attorney licensed in Indiana, it is
-not something to reason out here, and **every phase below that touches patient
-data waits on it.** Work that touches no patient data does not.
+What stays, because it's good practice independent of any regulation: **this
+is other people's medical information, and it gets handled like it matters.**
+Concretely, that means:
 
-Three more specifics that will bite if missed:
+- **No plaintext patient data to an uncontrolled third party.** A local
+  backend that holds an API key server-side and calls out on your behalf is
+  fine. A browser prompt that asks for a key and then POSTs a patient's name
+  and file straight to a public API endpoint is not — see *A live security
+  issue in the code*, right below, which is exactly that pattern, shipped.
+- **De-identify where it's free.** A case code instead of a name costs nothing
+  when the task doesn't need the identity, and it keeps the door open if the
+  compliance question ever comes back around (insurance billing, a partner
+  practice, anything that changes the legal picture).
+- **Local-first stays the architecture**, not a talking point. HERMES already
+  runs on your machine with a backend on `127.0.0.1`; agents reach it through
+  that backend, not by reading Drive directly with a personal key.
+- **Access control on the patient folder specifically.** The Drive layout
+  below marks it; an agent doesn't get a standing credential that can browse
+  it casually.
 
-- **The AI Studio key is not HIPAA-covered.** Google AI Studio is a developer
-  playground and is excluded from Google's BAA, as are Gems, NotebookLM,
-  Workspace Studio and consumer Gemini. Fine for prototyping with fake data;
-  out of compliance the moment a real patient name goes through.
-- **Vertex AI is not the answer, despite the obvious guess.** Vertex AI is
-  absent from Google's covered-products list. The covered service for
-  unattended processing is **Gemini Enterprise Agent Platform**. Google's own
-  pages are inconsistent here, so verify the exact product name against the
-  covered list before building on it — and note that Google's rule is that new
-  services default to *not* covered.
-- **Consumer Claude and consumer Gemini are also not covered.** Patient-facing
-  work runs through the APIs under a commercial agreement with a BAA, not
-  through the chat apps. Your own internal use of the chat apps — thinking
-  through a case without patient identifiers — is a different matter.
+One clinical boundary stays regardless of the compliance question, because
+it's a licensing matter, not a data one: **the patient-facing agent books,
+reschedules, answers logistics, and triages. It does not answer clinical
+questions.** Clinical questions get captured, flagged, and routed to you — the
+agent drafts, you approve.
 
-And one clinical boundary worth writing into the system rather than trusting to
-memory: **the patient-facing agent books, reschedules, answers logistics, and
-triages. It does not answer clinical questions.** Clinical questions get
-captured, flagged, and routed to you — the agent drafts, you approve. That
-protects scope of practice and keeps a licensed human on every clinical
-utterance. The research agent in Phase 5 is powerful precisely because it is
-pointed at *you*, not at patients.
-
-This is a real constraint, not a reason to build less. Everything below is
-designed around it.
+Everything below assumes this: build for real security, don't build for an
+audit.
 
 ---
 
-### The route that does not wait for the attorney
+### De-identify where it's free — not a workaround, a habit
 
-Your own 8 September architecture listed three ways past this, and the first
-one is the one that got dropped: **de-identify upstream.** It is worth putting
-back, because it is the only route that needs no determination, no BAA and no
-vendor's permission.
+Your own 8 September architecture listed de-identification as one way past a
+compliance blocker that no longer applies. It's still worth doing, for a
+plainer reason: it costs nothing when the task doesn't need a name, and it
+shrinks what's exposed if anything ever goes wrong.
 
-If a patient document enters the pipeline already reduced to a **case code** —
+If a patient document enters a pipeline already reduced to a **case code** —
 `AYB-0147` rather than a name, a date of birth reduced to a year, an address
-dropped entirely — then what the agents handle is not PHI, and both vendors'
-uncovered services are back on the table. The key that maps code to person
-lives in one place you control, that no agent can reach.
+dropped entirely — then a bug, a misconfigured share, or a compromised key
+exposes a lot less. The key that maps code to person lives in one place you
+control.
 
-What that unlocks immediately, with no legal gate:
+Where this pays off first:
 
 - The **scheduling and reminder half** of the follow-up coordinator: who is due
   for a three-month reassessment, whose intake never came back, which protocol
-  reviews are overdue. That is dates against case codes. It is not PHI, and it
-  is most of the value.
+  reviews are overdue. Dates against case codes — no name needed anywhere in
+  that pipeline.
 - Protocol and interaction work, which never needed a name to begin with.
 - The research desk, which is pointed at the literature, not at people.
 
-What it does not unlock: anything where the patient's own words, labs or
-narrative have to stay attached to reach a useful answer, and anything
-patient-*facing*, since the person on the phone is identified by definition.
-Those still wait on the determination.
+Where a name has to stay attached because the task genuinely needs it
+(document generation, physician letters, anything reading a patient's actual
+history): keep it inside the local backend, never in a browser call or a
+third-party prompt.
 
-The practical order, then: pursue the attorney question because it has the
-longest lead time, and build the de-identified half now rather than idling
-behind it.
+### A live security issue in the code
 
-### A PHI path that already exists in the code
-
-The blocker described above is not hypothetical here. The **Patients tab**
+This is not hypothetical. The **Patients tab**
 (`hermes/frontend/src/components/Patients.jsx`) has a Summarize button that
 posts a patient document's filename and full text from the browser straight to
 `api.anthropic.com`, using a key typed into a JavaScript prompt, with
@@ -267,12 +255,13 @@ posts a patient document's filename and full text from the browser straight to
 patient name, the filename usually carries one.
 
 That is exactly the L3 pipeline your 8 September page marked blocked — except
-it is shipped and clickable rather than waiting on a decision. Three things
-are true about it at once, and all three matter:
+it is shipped and clickable. Three things are true about it at once, and all
+three matter regardless of any compliance framework:
 
 1. It works, and it is genuinely useful before a consult.
-2. It sends identifiable patient information to an API on a key with no BAA
-   behind it.
+2. It sends identifiable patient information to a third-party API on a key
+   that lives in the browser, with no server-side control over what leaves
+   the machine.
 3. Nothing in the interface says so.
 
 The fix is not to delete the feature. It is to route it through the backend
@@ -315,25 +304,21 @@ work needs, and it is what MCP provides.
 
 ## Tools evaluated
 
-A running record, so a tool already looked at does not get re-litigated. The
-question that decides clinical use is always the same: **will the vendor sign
-a BAA?** Everything else is secondary.
+A running record, so a tool already looked at does not get re-litigated. With
+no compliance gate, the question that decides use is simpler: **does it keep
+patient data local and out of hands you haven't checked?**
 
 | Tool | What it is | Verdict |
 |---|---|---|
-| **Hermes Agent** (Nous Research) | Open-source autonomous agent, real project, actively released | **Non-clinical only.** Good candidate for the products company and public content |
-| **Hermes Apollo / "Agent OS"** (Julian Goldie) | Voice agent sold as a zip file through a paid community | **No.** Built for marketing businesses, unverifiable provenance, always-listening by default |
-| **Cloudways** | Managed hosting, the usual way Hermes Agent is run | **Will not sign a BAA.** No patient data, ever |
-| **DigitalOcean** | Cloudways' parent company | **Signs a BAA**, for designated covered products with Standard or Premium support |
-| **Google AI Studio** | Gemini API keys and prototyping | **Not BAA-covered.** Prototyping with non-patient data only |
-| **Vertex AI** | Gemini models via Google Cloud | **Absent from Google's covered list.** Not the patient-facing route, despite being the obvious guess |
-| **Gemini Enterprise Agent Platform** | Google Cloud's covered agent service | **The covered route** for unattended patient-data processing. Verify the name at signing |
-| **Google Voice** | Telephony inside Workspace | **Covered.** Check it before adding a telephony vendor |
-| **Workspace Studio / NotebookLM / Gems** | Google's no-code agent builder and notebooks | **Not covered.** The agent builder is the tool most wanted and least usable for patients |
-
-Note the Cloudways/DigitalOcean split. A parent company signing a BAA says
-nothing about its subsidiary, and the names invite exactly that assumption.
-Check the vendor actually being paid.
+| **Hermes Agent** (Nous Research) | Open-source autonomous agent, real project, actively released | **Non-clinical only.** Good candidate for the products company and public content — no reason to route patient data through a third-party agent framework either way |
+| **Hermes Apollo / "Agent OS"** (Julian Goldie) | Voice agent sold as a zip file through a paid community | **No.** Unverifiable provenance, always-listening by default — a real security concern, not just a compliance one |
+| **Cloudways** | Managed hosting, the usual way Hermes Agent is run | Fine for non-patient hosting; not where patient data lives regardless |
+| **DigitalOcean** | Cloudways' parent company | Same — evaluate on its own security posture if it ever holds anything sensitive |
+| **Google AI Studio** | Gemini API keys and prototyping | Fine for prototyping; still don't route real patient identifiers through it casually |
+| **Vertex AI** | Gemini models via Google Cloud | Usable now that no BAA gate applies — evaluate like any other API provider |
+| **Gemini Enterprise Agent Platform** | Google Cloud's covered agent service | No longer the load-bearing choice it was — pick based on capability now, not compliance status |
+| **Google Voice** | Telephony inside Workspace | Worth checking before adding a telephony vendor, on convenience grounds |
+| **Workspace Studio / NotebookLM / Gems** | Google's no-code agent builder and notebooks | Usable — still keep patient identifiers out of a no-code tool you can't audit as closely as your own backend |
 
 Three unrelated products share the Hermes name: this system, the Nous Research
 agent, and the Goldie voice product. A video about "the new Hermes update" is
@@ -356,8 +341,8 @@ Make HERMES callable by agents.
 - Register the server in both Claude Code and Antigravity.
 - Move the Patients-tab Summarize call off the browser and behind the local
   backend, so the key stops being typed into a prompt and identifiers can be
-  stripped before anything leaves the machine. See *A PHI path that already
-  exists in the code* above.
+  stripped before anything leaves the machine. See *A live security issue in
+  the code* above — this is the fix for it.
 - Lift the model pin out of the seven components into config, and re-point it.
 
 **The Drive layout is already decided**, and the MCP server should map onto it
@@ -373,14 +358,10 @@ structure are the filing system the agents inherit:
 | 06 | Research Library | Where the Phase 5 research desk files its finds |
 | 07 | Prompt Library | Prompts as data, not as strings in components |
 | 08 | Architecture & Build | This roadmap's home once it leaves the repo |
-| PT | Patient Records | **PHI. Nothing reaches it until the gate clears.** |
+| PT | Patient Records | **Real patient data. Restrict access; no agent gets a standing credential to browse it.** |
 
 **Done when:** you ask a question in Antigravity and in Claude, and both pull
 the same lab value out of HERMES.
-
-**In parallel:** get the covered-entity determination moving with an Indiana
-attorney. That, not the paperwork, is the long pole, and it blocks Phase 3.
-The BAAs themselves take minutes once the determination is in.
 
 ### Phase 2 — Protocols as code *(week 2)*
 
@@ -397,13 +378,13 @@ Your forty years of practice, written where agents can read it.
 Both vendors' agents load these. This is where the system stops being generic
 software and starts being *your* practice.
 
-### Phase 3 — The front desk *(weeks 3–4 — gated on BAAs)*
+### Phase 3 — The front desk *(weeks 3–4)*
 
-The virtual secretary. **Google Voice is a covered Workspace service**, so
-check whether it carries the call before adding a telephony vendor — staying
-inside Workspace removes a vendor, a contract and a second BAA. Twilio is the
-fallback if Voice cannot do what the front desk needs. The model behind it runs
-on a covered service or the Anthropic API under a signed agreement.
+The virtual secretary. **Google Voice** is worth checking before adding a
+telephony vendor — staying inside Workspace removes a vendor and a contract.
+Twilio is the fallback if Voice cannot do what the front desk needs. Whichever
+model runs behind it, calls and transcripts stay on the same local-backend
+path as everything else — no third-party logging you haven't checked.
 
 Ship it in this order, because the risk climbs with each step:
 
@@ -474,10 +455,11 @@ document stopping at your approval before a client sees it**. Its timeline —
 week 1 intake, week 3 check-in, month 3 reassessment, month 6 annual review —
 is the schedule the reminders run on.
 
-It splits cleanly along the line in *The route that does not wait for the
-attorney*: the tracking, reminder and dashboard half runs on dates and case
-codes and can be built now; the document-generation half handles patient
-narrative and waits. Build the half that runs.
+It splits cleanly along the line in *De-identify where it's free*: the
+tracking, reminder and dashboard half runs on dates and case codes and can be
+built first; the document-generation half handles patient narrative directly
+and should go through the local backend, not a browser call. Build the
+dates-and-codes half first — it's simpler and it's most of the value.
 
 - Post-visit follow-up on your schedule, drafted for your approval.
 - Protocol adherence check-ins.
@@ -515,8 +497,9 @@ These shape Phases 3 and 4, and I need your answers before building them:
 3. **Roughly how many calls a day**, and what share are scheduling versus
    clinical questions? Determines whether Phase 3 step 1 is worth shipping on
    its own.
-4. **Is About Your Body LLC's EIN in hand?** Google
-   and Anthropic both want one on a BAA.
+4. **Is About Your Body LLC's EIN in hand?** Useful for business-ops work
+   (QuickBooks, invoicing, any vendor contract) independent of the compliance
+   question, which is no longer gating anything here.
 5. **Which repository is the real HERMES?** Your 8 September structure points
    at `Herb-doc/HERMES`, commit `890af07`, branch `claude/hermes-initial-build`,
    and records model pins (`claude-opus-4-8`, `claude-opus-4-7`) that appear
