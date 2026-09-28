@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { Mail, Copy, Check } from 'lucide-react'
+import { api } from '../lib/api'
 
 const DOCTORS = [
   { name: 'Dr. Catherine Dos Santos', role: 'Primary Physician' },
@@ -17,12 +18,6 @@ export default function Letters({ data }) {
     if (!purpose.trim()) return
     setLoading(true)
 
-    const apiKey = prompt('Enter your Anthropic API key:')
-    if (!apiKey) {
-      setLoading(false)
-      return
-    }
-
     try {
       const findings = data.findings.map(f =>
         `${f.date}: ${f.test_name} = ${f.value} ${f.unit} (ref: ${f.reference_range}) [${f.flag}] — ${f.source}`
@@ -32,18 +27,9 @@ export default function Letters({ data }) {
         `${p.name}: ${p.purpose} (targets: ${p.targets?.join(', ')})`
       ).join('\n')
 
-      const response = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': apiKey,
-          'anthropic-version': '2023-06-01',
-          'anthropic-dangerous-direct-browser-access': 'true',
-        },
-        body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514',
-          max_tokens: 4096,
-          system: `You are HERMES, generating a physician letter for Daniel M. Phend, ND, MH (Naturopathic Doctor, Master Herbalist, 40+ years clinical experience, ${data.metadata?.practice || 'About Your Body LLC'}, ${data.metadata?.address || '901 East Reynolds Street, Goshen, IN 46526'}).
+      // The backend holds the Anthropic key; this page never sees it.
+      const result = await api.aiComplete({
+        system: `You are HERMES, generating a physician letter for Daniel M. Phend, ND, MH (Naturopathic Doctor, Master Herbalist, 40+ years clinical experience, ${data.metadata?.practice || 'About Your Body LLC'}, ${data.metadata?.address || '901 East Reynolds Street, Goshen, IN 46526'}).
 
 Write a professional, collaborative physician letter addressed to ${doctor}. The letter should:
 1. Include specific documented lab values with dates
@@ -60,17 +46,12 @@ Current herbal protocols:
 ${protocols}
 
 Return the complete formatted letter text.`,
-          messages: [{
-            role: 'user',
-            content: `Generate a physician letter with this focus:\n\n${purpose}`
-          }]
-        })
+        messages: [{
+          role: 'user',
+          content: `Generate a physician letter with this focus:\n\n${purpose}`
+        }],
       })
-
-      if (!response.ok) throw new Error(`API error: ${response.status}`)
-
-      const result = await response.json()
-      setLetter(result.content[0].text)
+      setLetter(result.text)
     } catch (err) {
       alert(`Error: ${err.message}`)
     } finally {

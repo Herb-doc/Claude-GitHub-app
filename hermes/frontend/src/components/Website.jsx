@@ -15,6 +15,7 @@ import {
   Leaf,
   MapPin,
 } from 'lucide-react'
+import { api } from '../lib/api'
 
 const QUICK_LINKS = [
   {
@@ -123,29 +124,14 @@ export default function Website({ data }) {
     if (!topic.trim()) return
     setLoading(true)
 
-    const apiKey = prompt('Enter your Anthropic API key:')
-    if (!apiKey) {
-      setLoading(false)
-      return
-    }
-
     try {
       const protocolContext = activeProtocols
         .map(p => `${p.name}: ${p.purpose}`)
         .join('\n')
 
-      const response = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': apiKey,
-          'anthropic-version': '2023-06-01',
-          'anthropic-dangerous-direct-browser-access': 'true',
-        },
-        body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514',
-          max_tokens: 4096,
-          system: `You are HERMES, drafting public-facing website and practice content for Daniel M. Phend, ND, MH — a Naturopathic Doctor and Master Herbalist with 40+ years of clinical experience, specializing in immune and autoimmune disorders. His practice is ${metadata.practice || 'About Your Body LLC'} in ${metadata.location || 'Goshen, Indiana'}, online at aboutyourbody.net.
+      // The backend holds the Anthropic key; this page never sees it.
+      const result = await api.aiComplete({
+        system: `You are HERMES, drafting public-facing website and practice content for Daniel M. Phend, ND, MH — a Naturopathic Doctor and Master Herbalist with 40+ years of clinical experience, specializing in immune and autoimmune disorders. His practice is ${metadata.practice || 'About Your Body LLC'} in ${metadata.location || 'Goshen, Indiana'}, online at aboutyourbody.net.
 
 VOICE AND STANDARDS
 - Write in his voice: naturopathic and botanical medicine grounded in evidence, spoken by an experienced clinician who respects the reader's intelligence.
@@ -166,19 +152,14 @@ FORMAT
 PRACTICE CONTEXT (background only — do not disclose patient data or present it as case material)
 Active clinical focus areas in this practice:
 ${protocolContext || 'Immune and autoimmune support through botanical medicine.'}`,
-          messages: [{
-            role: 'user',
-            content: `Draft a ${contentType} for ${metadata.practice || 'About Your Body LLC'}.
+        messages: [{
+          role: 'user',
+          content: `Draft a ${contentType} for ${metadata.practice || 'About Your Body LLC'}.
 
 TOPIC: ${topic}${keyPoints.trim() ? `\n\nKEY POINTS TO COVER:\n${keyPoints}` : ''}`
-          }]
-        })
+        }],
       })
-
-      if (!response.ok) throw new Error(`API error: ${response.status}`)
-
-      const result = await response.json()
-      setDraft(result.content[0].text)
+      setDraft(result.text)
     } catch (err) {
       alert(`Error: ${err.message}`)
     } finally {

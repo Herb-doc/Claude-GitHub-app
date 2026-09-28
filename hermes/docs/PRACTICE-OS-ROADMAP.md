@@ -245,36 +245,41 @@ Where a name has to stay attached because the task genuinely needs it
 history): keep it inside the local backend, never in a browser call or a
 third-party prompt.
 
-### A live security issue in the code
+### Fixed: the browser-held key across six tabs *(28 September 2026)*
 
-This is not hypothetical. The **Patients tab**
-(`hermes/frontend/src/components/Patients.jsx`) has a Summarize button that
-posts a patient document's filename and full text from the browser straight to
-`api.anthropic.com`, using a key typed into a JavaScript prompt, with
-`anthropic-dangerous-direct-browser-access` set. Since the folder search is by
-patient name, the filename usually carries one.
+This was not hypothetical. Six tabs — **Patients**, **Consult**, **Letters**,
+**Protocols**, **Analyze**, and **Website** — each had a button that prompted
+for an Anthropic API key in the browser (or, for Consult, held it in page
+state for the session) and called `api.anthropic.com` directly from the page.
+Patients' Summarize button was the sharpest version of it: it posted a
+patient document's filename and full text straight from the browser, with
+`anthropic-dangerous-direct-browser-access` set. Since folder search there is
+by patient name, the filename usually carried one — exactly the L3 pipeline
+the 8 September page had marked blocked, except shipped and clickable.
 
-That is exactly the L3 pipeline your 8 September page marked blocked — except
-it is shipped and clickable. Three things are true about it at once, and all
-three matter regardless of any compliance framework:
+All six are fixed the same way now: **the key lives only in the backend's own
+environment variable, `ANTHROPIC_API_KEY`, and the browser never talks to
+Anthropic directly.**
 
-1. It works, and it is genuinely useful before a consult.
-2. It sends identifiable patient information to a third-party API on a key
-   that lives in the browser, with no server-side control over what leaves
-   the machine.
-3. Nothing in the interface says so.
+- `hermes/server/server.py` gained two endpoints. `POST /api/summarize`
+  re-reads a document from Drive server-side rather than trusting text the
+  browser sends — the right shape for Patients, where the content is someone
+  else's file. `POST /api/ai/complete` is a general completion call for the
+  other five, where the content is either the practitioner's own
+  already-loaded data or something typed into the page — no re-fetch needed,
+  the browser-composed prompt is trusted the way it already was.
+- Consult's whole "enter your key to start" gate screen is gone; the chat
+  opens straight away.
+- The model string is no longer typed into seven places. Both Python
+  processes that call Claude (`server.py` and `hermes/agent/hermes_agent.py`)
+  read one `HERMES_CLAUDE_MODEL` environment variable, defaulting to
+  `claude-sonnet-5` — a real re-point, two generations forward from the prior
+  pin, not just a config refactor.
 
-The fix is not to delete the feature. It is to route it through the backend
-that already exists on `127.0.0.1` — which can hold the key server-side, strip
-identifiers to a case code before the call, and log what went out. That is a
-Phase 1 item, not a Phase 3 one, because the button exists today.
-
-**Also worth a look while in there:** every model call in this repo is pinned
-to `claude-sonnet-4-20250514`, in seven source files and the built bundle.
-That pin is two model generations back. Nothing is broken by it, but a
-re-point belongs in the same pass, and it should come from config rather than
-being typed into seven components — the same lesson as the practice name and
-the address.
+What this doesn't change: Patients' de-identification-before-the-call is
+still a good idea and still not implemented — `/api/summarize` reads the
+whole document text as-is. That's a real follow-up, not a regression from
+before; the prior version had no de-identification either.
 
 ---
 
@@ -339,11 +344,13 @@ Make HERMES callable by agents.
 - Teach Guardian to check `GOOGLE_API_KEY` and the MCP server's health, so a
   broken spine shows up in the tab you already trust.
 - Register the server in both Claude Code and Antigravity.
-- Move the Patients-tab Summarize call off the browser and behind the local
-  backend, so the key stops being typed into a prompt and identifiers can be
-  stripped before anything leaves the machine. See *A live security issue in
-  the code* above — this is the fix for it.
-- Lift the model pin out of the seven components into config, and re-point it.
+- ~~Move the Patients-tab Summarize call off the browser and behind the local
+  backend~~ — **done**, and extended to the five other tabs with the same
+  pattern. See *Fixed: the browser-held key across six tabs* above.
+- ~~Lift the model pin out of the seven components into config, and re-point
+  it~~ — **done**, via `HERMES_CLAUDE_MODEL`, same section.
+- Still open from that fix: de-identify a document's text before it reaches
+  `/api/summarize`, rather than sending the whole thing as read.
 
 **The Drive layout is already decided**, and the MCP server should map onto it
 rather than invent a second scheme. The numbered folders in your 8 September

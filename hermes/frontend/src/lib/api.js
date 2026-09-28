@@ -73,6 +73,16 @@ export const api = {
   summarizeDocument: (fileId, opts) =>
     request('/api/summarize', { ...opts, method: 'POST', body: { file_id: fileId } }),
 
+  // General-purpose Claude completion — used by every tab that drafts or
+  // analyzes text (Consult, Letters, Protocols, Analyze, Website). The
+  // backend holds the Anthropic key; this call never does.
+  aiComplete: ({ system, messages, maxTokens }, opts) =>
+    request('/api/ai/complete', {
+      ...opts,
+      method: 'POST',
+      body: { system, messages, ...(maxTokens ? { max_tokens: maxTokens } : {}) },
+    }),
+
   driveRecent: (limit = 25, opts) =>
     request(`/api/drive/recent${qs({ limit })}`, opts),
 

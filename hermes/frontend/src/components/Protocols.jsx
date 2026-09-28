@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { Leaf, Plus, Pause, Play, ShieldAlert } from 'lucide-react'
+import { api } from '../lib/api'
 
 export default function Protocols({ data, setData }) {
   const [showAdd, setShowAdd] = useState(false)
@@ -41,37 +42,22 @@ export default function Protocols({ data, setData }) {
   const checkInteractions = async () => {
     if (!interactionCheck.trim()) return
 
-    const apiKey = prompt('Enter your Anthropic API key:')
-    if (!apiKey) return
-
     try {
       const activeProtocols = protocols
         .filter(p => p.status === 'active')
         .map(p => p.name)
         .join(', ')
 
-      const response = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': apiKey,
-          'anthropic-version': '2023-06-01',
-          'anthropic-dangerous-direct-browser-access': 'true',
-        },
-        body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514',
-          max_tokens: 2048,
-          system: 'You are HERMES, a medical intelligence system specializing in herb-drug interactions. Provide evidence-based interaction analysis with severity ratings (None, Minor, Moderate, Major) and clinical recommendations. Include peer-reviewed references where available.',
-          messages: [{
-            role: 'user',
-            content: `Check for interactions between this medication/supplement:\n"${interactionCheck}"\n\nAnd these active herbal protocols:\n${activeProtocols}\n\nProvide a detailed interaction analysis.`
-          }]
-        })
+      // The backend holds the Anthropic key; this page never sees it.
+      const result = await api.aiComplete({
+        system: 'You are HERMES, a medical intelligence system specializing in herb-drug interactions. Provide evidence-based interaction analysis with severity ratings (None, Minor, Moderate, Major) and clinical recommendations. Include peer-reviewed references where available.',
+        messages: [{
+          role: 'user',
+          content: `Check for interactions between this medication/supplement:\n"${interactionCheck}"\n\nAnd these active herbal protocols:\n${activeProtocols}\n\nProvide a detailed interaction analysis.`
+        }],
+        maxTokens: 2048,
       })
-
-      if (!response.ok) throw new Error(`API error: ${response.status}`)
-      const result = await response.json()
-      setInteractionResult(result.content[0].text)
+      setInteractionResult(result.text)
     } catch (err) {
       setInteractionResult(`Error: ${err.message}`)
     }

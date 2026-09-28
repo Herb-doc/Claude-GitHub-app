@@ -59,8 +59,12 @@ people's medical information and still worth protecting on its own merits:
 - **No plaintext patient data leaves the machine to an uncontrolled
   destination.** A local backend holding API keys server-side is fine. A
   browser prompt asking for a key, then POSTing a patient's file and name
-  straight to a third-party API, is not — that pattern is being removed
-  wherever it appears (see the Patients tab fix, Phase 1 of the roadmap).
+  straight to a third-party API, is not. That pattern existed in six tabs and
+  is fixed as of 28 September 2026 — every AI call now goes through the
+  backend's `/api/summarize` or `/api/ai/complete`, and the key never reaches
+  the browser. See the roadmap's *Fixed: the browser-held key across six
+  tabs* for what changed and what's still open (de-identifying a document's
+  text before it reaches `/api/summarize`).
 - **No secrets in the browser, in prompts, or in git.** Never commit
   `credentials.json`, `token.json`, API keys, or any file containing patient
   information. `.gitignore` covers the known ones; that is not a substitute
