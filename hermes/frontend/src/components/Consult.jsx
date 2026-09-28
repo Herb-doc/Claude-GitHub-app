@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react'
-import { MessageCircle, Send, KeyRound } from 'lucide-react'
+import { MessageCircle, Send } from 'lucide-react'
+import { api } from '../lib/api'
 
 const SUGGESTED_QUESTIONS = [
   "What patterns concern you most in my current data?",
@@ -13,8 +14,6 @@ export default function Consult({ data }) {
   const [messages, setMessages] = useState([])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
-  const [apiKey, setApiKey] = useState('')
-  const [showKeyInput, setShowKeyInput] = useState(true)
   const messagesEndRef = useRef(null)
 
   useEffect(() => {
@@ -31,7 +30,7 @@ export default function Consult({ data }) {
     ).join('\n')
 
     return `You are HERMES — Health & Evidence Repository, Medical Expert & Synthesis.
-You are Daniel M. Phend's personal medical intelligence system. Daniel is a Naturopathic Doctor (ND) and Master Herbalist (MH) with 40+ years of clinical experience specializing in immune and autoimmune disorders. Practice: Future Body Sciences, La Porte, Indiana.
+You are Daniel M. Phend's personal medical intelligence system. Daniel is a Naturopathic Doctor (ND) and Master Herbalist (MH) with 40+ years of clinical experience specializing in immune and autoimmune disorders. Practice: ${data.metadata?.practice || 'About Your Body LLC'}, ${data.metadata?.address || '901 East Reynolds Street, Goshen, IN 46526'}.
 
 Your personality: 60% clinical precision, 40% warm trusted friend. Address Daniel by name occasionally. You are his ally in understanding his own health data.
 
@@ -56,7 +55,7 @@ Respond with clinical depth appropriate for a fellow practitioner, but explain c
   }
 
   const sendMessage = async (text) => {
-    if (!text?.trim() || !apiKey) return
+    if (!text?.trim()) return
     const userMsg = { role: 'user', content: text }
     const updatedMessages = [...messages, userMsg]
     setMessages(updatedMessages)
@@ -69,67 +68,21 @@ Respond with clinical depth appropriate for a fellow practitioner, but explain c
         content: m.content
       }))
 
-      const response = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': apiKey,
-          'anthropic-version': '2023-06-01',
-          'anthropic-dangerous-direct-browser-access': 'true',
-        },
-        body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514',
-          max_tokens: 4096,
-          system: buildSystemPrompt(),
-          messages: apiMessages,
-        })
+      // The backend holds the Anthropic key; this page never sees it.
+      const result = await api.aiComplete({
+        system: buildSystemPrompt(),
+        messages: apiMessages,
       })
-
-      if (!response.ok) throw new Error(`API error: ${response.status}`)
-      const result = await response.json()
-      const assistantMsg = { role: 'assistant', content: result.content[0].text }
+      const assistantMsg = { role: 'assistant', content: result.text }
       setMessages([...updatedMessages, assistantMsg])
     } catch (err) {
       setMessages([...updatedMessages, {
         role: 'assistant',
-        content: `**Error:** ${err.message}\n\nPlease check your API key and try again.`
+        content: `**Error:** ${err.message}`
       }])
     } finally {
       setLoading(false)
     }
-  }
-
-  if (showKeyInput) {
-    return (
-      <div className="space-y-6 animate-fade-in">
-        <h2 className="text-xl font-display text-hermes-gold">Consult HERMES</h2>
-        <div className="bg-hermes-card border border-hermes-border rounded-2xl p-8 max-w-lg mx-auto space-y-5">
-          <div className="flex justify-center">
-            <div className="p-3 rounded-2xl gradient-gold">
-              <KeyRound size={28} className="text-yellow-900" />
-            </div>
-          </div>
-          <p className="text-hermes-muted text-sm text-center">
-            Enter your Anthropic API key to start a consultation.
-            Your key stays in this browser session only.
-          </p>
-          <input
-            type="password"
-            value={apiKey}
-            onChange={e => setApiKey(e.target.value)}
-            placeholder="sk-ant-..."
-            className="w-full bg-hermes-surface border border-hermes-border rounded-xl px-4 py-3 font-ui text-sm text-hermes-text placeholder-hermes-muted focus:border-hermes-gold focus:outline-none"
-          />
-          <button
-            onClick={() => { if (apiKey.trim()) setShowKeyInput(false) }}
-            disabled={!apiKey.trim()}
-            className="w-full px-6 py-3 gradient-gold text-hermes-bg rounded-xl font-ui text-sm font-bold hover:opacity-90 transition-opacity disabled:opacity-50"
-          >
-            Start Consultation
-          </button>
-        </div>
-      </div>
-    )
   }
 
   return (

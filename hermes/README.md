@@ -22,6 +22,19 @@ server except Anthropic's API, and only when you use an AI feature.
 
 ---
 
+## A note on the name
+
+This HERMES is a name collision with **Hermes Agent** by Nous Research, an
+unrelated open-source AI agent that is actively released and covered on
+YouTube. They share nothing but the word.
+
+This one is built for this practice and lives only in this repository. It has
+no public releases and no version to upgrade to — it is whatever was last
+committed here. The `1.0.0` in `package.json` is npm's default placeholder,
+not a release number.
+
+---
+
 ## The tabs
 
 | Tab | What it does |
@@ -168,4 +181,16 @@ charts.
 
 ---
 
-*Built for Daniel M. Phend, ND, MH — Future Body Sciences, La Porte, Indiana*
+## Where HERMES is going
+
+HERMES is the foundation for a wider system that runs the practice — front
+desk, intake, clinical research, follow-up and books, with Google and
+Anthropic agents sharing the same tools and the same protocols.
+
+The plan, the compliance gate, and the first hour of setup:
+**[docs/PRACTICE-OS-ROADMAP.md](docs/PRACTICE-OS-ROADMAP.md)**
+
+---
+
+*Built for Daniel M. Phend, ND, MH — About Your Body LLC*
+*901 East Reynolds Street, Goshen, IN 46526*

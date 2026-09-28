@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { FlaskConical, Plus, TrendingUp } from 'lucide-react'
+import { api } from '../lib/api'
 
 const FLAG_COLORS = {
   CRITICAL: 'text-red-400 bg-red-500/15',
@@ -21,12 +22,6 @@ export default function Analyze({ data, setData }) {
     setError(null)
     setResults(null)
 
-    const apiKey = prompt('Enter your Anthropic API key:')
-    if (!apiKey) {
-      setLoading(false)
-      return
-    }
-
     try {
       const existingContext = data.findings.slice(0, 10).map(f =>
         `${f.date}: ${f.test_name} = ${f.value} ${f.unit} [${f.flag}]`
@@ -34,18 +29,9 @@ export default function Analyze({ data, setData }) {
 
       const protocols = data.protocols.map(p => p.name).join(', ')
 
-      const response = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': apiKey,
-          'anthropic-version': '2023-06-01',
-          'anthropic-dangerous-direct-browser-access': 'true',
-        },
-        body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514',
-          max_tokens: 4096,
-          system: `You are HERMES, a medical intelligence system for Daniel M. Phend, ND, MH.
+      // The backend holds the Anthropic key; this page never sees it.
+      const result = await api.aiComplete({
+        system: `You are HERMES, a medical intelligence system for Daniel M. Phend, ND, MH.
 Parse the lab results below and return a JSON object with this structure:
 {
   "findings": [{ "date": "", "test_name": "", "value": "", "unit": "", "reference_range": "", "flag": "CRITICAL|HIGH|LOW|WATCH|NORMAL", "category": "", "source": "Manual Upload" }],
@@ -65,17 +51,12 @@ Recent values for comparison:
 ${existingContext}
 
 Return ONLY valid JSON, no other text.`,
-          messages: [{
-            role: 'user',
-            content: `Parse these lab results:\n\n${labText}`
-          }]
-        })
+        messages: [{
+          role: 'user',
+          content: `Parse these lab results:\n\n${labText}`
+        }],
       })
-
-      if (!response.ok) throw new Error(`API error: ${response.status}`)
-
-      const result = await response.json()
-      const text = result.content[0].text
+      const text = result.text
 
       let parsed
       try {

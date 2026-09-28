@@ -23,6 +23,7 @@ from typing import Any
 try:
     from fastapi import FastAPI, HTTPException, Query
     from fastapi.middleware.cors import CORSMiddleware
+    from pydantic import BaseModel, Field
     import uvicorn
 except ImportError:
     print(
@@ -30,6 +31,11 @@ except ImportError:
         "    pip install -r requirements.txt\n"
     )
     sys.exit(1)
+
+try:
+    import anthropic
+except ImportError:
+    anthropic = None  # Summarize endpoint reports this clearly rather than crashing the server.
 
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
@@ -60,6 +66,22 @@ DOC_MIMES = {
     "docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
     "folder": "application/vnd.google-apps.folder",
 }
+
+# The model every AI call in HERMES uses — one place to change it, rather
+# than a string typed into every component that wants a completion.
+# Override with HERMES_CLAUDE_MODEL if you want a different model without
+# touching code; hermes/agent/hermes_agent.py reads the same variable.
+CLAUDE_MODEL = os.environ.get("HERMES_CLAUDE_MODEL", "claude-sonnet-5")
+
+SUMMARY_SYSTEM_PROMPT = (
+    "You are HERMES, clinical assistant to Daniel M. Phend, ND, MH — a "
+    "naturopathic doctor and master herbalist. Summarize this patient "
+    "document for a practitioner reviewing it before a consult. Give: "
+    "(1) a one-paragraph overview, (2) key findings with any values and "
+    "dates, (3) anything abnormal or flagged, (4) open questions worth "
+    "following up. Be precise and concise. Do not invent values that are "
+    "not in the document — if something is unclear, say so."
+)
 
 # Cap extracted text so a huge scan can't blow up the browser or a later
 # AI call. Roughly 15k characters is several pages of lab results.
@@ -302,11 +324,13 @@ def _file_row(f: dict) -> dict:
     }
 
 
-@app.get("/api/files/{file_id}/text")
-def file_text(file_id: str):
-    """Pull the readable text out of one Drive document."""
-    drive = service("drive", "v3")
+def _read_document(drive, file_id: str) -> tuple[dict, str]:
+    """Fetch a Drive file's metadata and its extracted text, server-side.
 
+    Shared by /api/files/{id}/text and /api/summarize, so a document's text
+    is always read the same way — and a summarize request never has to trust
+    text handed to it by the browser.
+    """
     try:
         meta = drive.files().get(
             fileId=file_id, fields="id, name, mimeType, modifiedTime, webViewLink"
@@ -330,6 +354,15 @@ def file_text(file_id: str):
     except HttpError as e:
         raise google_error(e)
 
+    return meta, text
+
+
+@app.get("/api/files/{file_id}/text")
+def file_text(file_id: str):
+    """Pull the readable text out of one Drive document."""
+    drive = service("drive", "v3")
+    meta, text = _read_document(drive, file_id)
+
     truncated = len(text) > MAX_TEXT_CHARS
     return {
         "id": file_id,
@@ -340,6 +373,110 @@ def file_text(file_id: str):
         "truncated": truncated,
         "characters": len(text),
     }
+
+
+def _anthropic_client() -> "anthropic.Anthropic":
+    """
+    One place that turns ANTHROPIC_API_KEY into a ready client, or explains
+    clearly why it can't. Every AI-calling endpoint in this file goes
+    through this — none of them, and no component in the dashboard, holds
+    or asks for the key itself.
+    """
+    if anthropic is None:
+        raise HTTPException(
+            status_code=500,
+            detail="The 'anthropic' package isn't installed. Run: pip install -r requirements.txt",
+        )
+
+    api_key = os.environ.get("ANTHROPIC_API_KEY")
+    if not api_key:
+        raise HTTPException(
+            status_code=500,
+            detail=(
+                "ANTHROPIC_API_KEY is not set on the server. Set it in the "
+                "environment HERMES's backend runs in, then restart: "
+                "export ANTHROPIC_API_KEY=your_key_here"
+            ),
+        )
+
+    return anthropic.Anthropic(api_key=api_key)
+
+
+def _complete(system: str, messages: list[dict], max_tokens: int) -> str:
+    """Run one Claude completion and return the text, with one consistent
+    error shape for every caller."""
+    client = _anthropic_client()
+    try:
+        response = client.messages.create(
+            model=CLAUDE_MODEL,
+            max_tokens=max_tokens,
+            system=system,
+            messages=messages,
+        )
+    except anthropic.APIError as e:
+        raise HTTPException(status_code=502, detail=f"Anthropic API error: {e}")
+
+    return response.content[0].text
+
+
+class SummarizeRequest(BaseModel):
+    file_id: str
+
+
+@app.post("/api/summarize")
+def summarize_document(body: SummarizeRequest):
+    """
+    Summarize a patient document server-side.
+
+    The document is re-read from Drive here rather than trusting text sent
+    by the browser, and the Anthropic key lives only in this process's
+    environment — it never reaches the dashboard. This replaces a prior
+    version of the Patients tab that asked for the key in a browser prompt
+    and called api.anthropic.com directly from the page; that pattern sent
+    a patient's document to a third party on a key that lived in the
+    browser, with nothing server-side to control or log what left the
+    machine.
+    """
+    drive = service("drive", "v3")
+    meta, text = _read_document(drive, body.file_id)
+    name = meta.get("name", "Untitled")
+
+    summary = _complete(
+        system=SUMMARY_SYSTEM_PROMPT,
+        messages=[{
+            "role": "user",
+            "content": f"Document: {name}\n\n{text[:MAX_TEXT_CHARS]}",
+        }],
+        max_tokens=2048,
+    )
+    return {"id": body.file_id, "name": name, "summary": summary}
+
+
+class CompleteRequest(BaseModel):
+    system: str
+    messages: list[dict]
+    max_tokens: int = Field(4096, ge=1, le=8192)
+
+
+@app.post("/api/ai/complete")
+def ai_complete(body: CompleteRequest):
+    """
+    General-purpose Claude completion, used by every tab that drafts or
+    analyzes text on the practitioner's own already-loaded data or typed
+    input: Consult, Letters, Protocols' interaction checker, Analyze, and
+    Website's content studio.
+
+    Each of those used to ask for the Anthropic key in a browser prompt and
+    call api.anthropic.com directly from the page — the same pattern the
+    Patients tab had, fixed the same way here: the key stays server-side,
+    and the browser never talks to Anthropic directly. Unlike /api/summarize,
+    this endpoint trusts the text it's given, because that text is either
+    the practitioner's own already-local health data or something they
+    typed into the page themselves — never a document read fresh from
+    Drive on their behalf.
+    """
+    text = _complete(system=body.system, messages=body.messages, max_tokens=body.max_tokens)
+    return {"text": text}
 
 
 # ─── Drive ──────────────────────────────────────────────────────────────────

@@ -48,7 +48,9 @@ DATA_FILE = PROJECT_DIR / "frontend" / "src" / "data" / "hermes_data.json"
 CREDENTIALS_FILE = AGENT_DIR / "credentials.json"
 TOKEN_FILE = AGENT_DIR / "token.json"
 
-CLAUDE_MODEL = "claude-sonnet-4-20250514"
+# Same variable the backend server (hermes/server/server.py) reads, so one
+# override updates the model everywhere HERMES calls Claude.
+CLAUDE_MODEL = os.environ.get("HERMES_CLAUDE_MODEL", "claude-sonnet-5")
 
 PARSE_SYSTEM_PROMPT = (
     "You are a medical data parser. Extract all lab values, "

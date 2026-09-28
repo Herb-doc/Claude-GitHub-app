@@ -237,37 +237,14 @@ function DocumentView({ doc, onBack }) {
   const [copied, setCopied] = useState(false)
 
   const summarize = async () => {
-    const apiKey = prompt('Enter your Anthropic API key:')
-    if (!apiKey) return
-
     setSummarizing(true)
     setSummary(null)
     try {
-      const response = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': apiKey,
-          'anthropic-version': '2023-06-01',
-          'anthropic-dangerous-direct-browser-access': 'true',
-        },
-        body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514',
-          max_tokens: 2048,
-          system:
-            'You are HERMES, clinical assistant to Daniel M. Phend, ND, MH — a naturopathic doctor and master herbalist. ' +
-            'Summarize this patient document for a practitioner reviewing it before a consult. Give: (1) a one-paragraph overview, ' +
-            '(2) key findings with any values and dates, (3) anything abnormal or flagged, (4) open questions worth following up. ' +
-            'Be precise and concise. Do not invent values that are not in the document — if something is unclear, say so.',
-          messages: [{
-            role: 'user',
-            content: `Document: ${doc.name}\n\n${doc.text}`,
-          }],
-        }),
-      })
-      if (!response.ok) throw new Error(`API error: ${response.status}`)
-      const result = await response.json()
-      setSummary(result.content[0].text)
+      // The backend re-reads the document from Drive and calls Anthropic
+      // itself, using a key that lives in its own environment — never in
+      // this browser. See hermes/server/server.py's /api/summarize.
+      const result = await api.summarizeDocument(doc.id)
+      setSummary(result.summary)
     } catch (err) {
       setSummary(`Error: ${err.message}`)
     } finally {
