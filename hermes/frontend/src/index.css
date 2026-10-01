@@ -11,13 +11,53 @@
 
 @keyframes pulse-glow {
   0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+  50% { opacity: 0.6; }
 }
 
 .pulse-alert {
-  animation: pulse-glow 1.5s ease-in-out infinite;
+  animation: pulse-glow 2s ease-in-out infinite;
 }
 
 .font-ui {
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+.gradient-gold {
+  background: linear-gradient(135deg, #D4A843 0%, #E8C66A 50%, #D4A843 100%);
+}
+
+.gradient-blue {
+  background: linear-gradient(135deg, #1a3a6b 0%, #2a5a9b 50%, #4A8FD4 100%);
+}
+
+.gradient-teal {
+  background: linear-gradient(135deg, #1a4a4a 0%, #2a6b6b 50%, #3ABFBF 100%);
+}
+
+.gradient-purple {
+  background: linear-gradient(135deg, #2a1a5b 0%, #4a3a8b 50%, #9B7BFF 100%);
+}
+
+.gradient-pink {
+  background: linear-gradient(135deg, #4a1a3a 0%, #7a2a5a 50%, #E06B9F 100%);
+}
+
+.gradient-red {
+  background: linear-gradient(135deg, #4a1a1a 0%, #7a2a2a 50%, #FF4444 100%);
+}
+
+.gradient-green {
+  background: linear-gradient(135deg, #1a3a2a 0%, #2a5b3a 50%, #52C47A 100%);
+}
+
+.gradient-orange {
+  background: linear-gradient(135deg, #4a2a1a 0%, #7a4a2a 50%, #E08030 100%);
+}
+
+.card-glow:hover {
+  box-shadow: 0 0 20px rgba(212, 168, 67, 0.15);
+}
+
+.nav-active {
+  background: linear-gradient(180deg, rgba(212, 168, 67, 0.15) 0%, rgba(212, 168, 67, 0.05) 100%);
 }

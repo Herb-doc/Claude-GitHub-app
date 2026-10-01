@@ -10,3 +10,11 @@ __pycache__/
 venv/
 hermes_data_backup*.json
 .DS_Store
+
+# Guardian runtime artifacts — local to each machine
+hermes/guardian/backups/
+hermes/guardian/repair_log.jsonl
+
+# Inventory output lists real file names (may include patient names) — keep local
+hermes/inventory/output/
+hermes/inventory/token_*.json
